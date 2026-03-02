@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
 import { NetworkHealthGraphComponent } from '../../components/network-health-graph/network-health-graph.component';
+import { ProbeService, Measurement } from '../../services/probe.service';
 
 @Component({
-    selector: 'app-network-health',
-    imports: [CommonModule, FormsModule, NetworkHealthGraphComponent],
-    templateUrl: './network-health.component.html',
-    styleUrls: ['./network-health.component.css']
+  selector: 'app-network-health',
+  imports: [CommonModule, FormsModule, NetworkHealthGraphComponent],
+  templateUrl: './network-health.component.html',
+  styleUrls: ['./network-health.component.css']
 })
-export class NetworkHealthComponent implements OnInit {
+export class NetworkHealthComponent implements OnInit, OnDestroy {
   records: any[] = [];
   filteredRecords: any[] = [];
   uniqueSites: string[] = [];
@@ -28,13 +29,58 @@ export class NetworkHealthComponent implements OnInit {
   Math = Math;
   form = { site: '', interface: '', upload_mbps: 0, download_mbps: 0, latency_ms: 0, packet_loss_percent: 0, uptime_percent: 99 };
 
-  constructor(
-    private api: ApiService, 
-    private toast: ToastService,
-    public auth: AuthService
-  ) {}
+  latest: Measurement | null = null;
+  history: Measurement[] = [];
+  deviceId = 'home-probe-01';
+  range = '1h';
+  private refreshTimer: any;
 
-  ngOnInit() { this.loadRecords(); }
+  constructor(
+    private api: ApiService,
+    private toast: ToastService,
+    public auth: AuthService,
+    private probe: ProbeService
+  ) { }
+
+  ngOnInit() {
+    this.loadRecords();
+    this.loadData();
+    this.refreshTimer = setInterval(() => this.loadData(), 60_000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.refreshTimer);
+  }
+
+  loadData(): void {
+    this.probe.getLatest(this.deviceId).subscribe({
+      next: m => this.latest = m,
+      error: e => console.error('Probe latest failed', e)
+    });
+
+    const now = new Date();
+    const start = new Date(now);
+    if (this.range === '1h') start.setHours(now.getHours() - 1);
+    if (this.range === '24h') start.setDate(now.getDate() - 1);
+    if (this.range === '7d') start.setDate(now.getDate() - 7);
+
+    this.probe.getHistory(
+      this.deviceId,
+      start.toISOString(),
+      now.toISOString()
+    ).subscribe({
+      next: items => { this.history = items; this.buildCharts(); },
+      error: e => console.error('Probe history failed', e)
+    });
+  }
+
+  buildCharts(): void {
+  }
+
+  onRangeChange(r: string): void {
+    this.range = r;
+    this.loadData();
+  }
 
   loadRecords() {
     this.loading = true;

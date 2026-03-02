@@ -8,6 +8,7 @@ from blueprint.Devices.devices import devices_bp
 from blueprint.sessions.sessions import sessions_bp
 from blueprint.Network_health.Networks_health import network_health_bp
 from blueprint.users.users import users_bp
+from blueprint.probe.routes import probe_bp
 
 
 app = Flask(__name__)
@@ -35,6 +36,7 @@ app.register_blueprint(devices_bp)
 app.register_blueprint(sessions_bp)
 app.register_blueprint(network_health_bp)
 app.register_blueprint(users_bp)
+app.register_blueprint(probe_bp, url_prefix='/probe')
 
 # Health check endpoint for frontend dependency
 @app.route('/health', methods=['GET'])

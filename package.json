@@ -1,0 +1,17 @@
+{
+    "name": "netguard-v2-dev",
+    "version": "1.0.0",
+    "description": "Run frontend, backend, and probe concurrently",
+    "scripts": {
+        "dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"npm run start:probe\"",
+        "dev:dashboard": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+        "start:frontend": "cd frontend && npm start",
+        "start:backend": "cd backend && pip install -r requirements.txt && python app.py",
+        "start:probe": "cd probe && pip install -r requirements.txt && python probe.py"
+    },
+    "author": "Md Abdur Rahman Fahad",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

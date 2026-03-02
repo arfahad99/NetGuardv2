@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NetworkHealthComponent } from './network-health.component';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
+import { ProbeService } from '../../services/probe.service';
 import { of } from 'rxjs';
 
 describe('NetworkHealthComponent', () => {
@@ -19,13 +20,17 @@ describe('NetworkHealthComponent', () => {
   beforeEach(async () => {
     const apiSpy = jasmine.createSpyObj('ApiService', ['getNetworkHealth', 'createNetworkHealth', 'updateNetworkHealth', 'deleteNetworkHealth']);
     const toastSpy = jasmine.createSpyObj('ToastService', ['success', 'error', 'warning']);
+    const probeSpy = jasmine.createSpyObj('ProbeService', ['getLatest', 'getHistory']);
     apiSpy.getNetworkHealth.and.returnValue(of(mockRecords));
+    probeSpy.getLatest.and.returnValue(of({}));
+    probeSpy.getHistory.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [NetworkHealthComponent, HttpClientTestingModule, FormsModule],
       providers: [
         { provide: ApiService, useValue: apiSpy },
-        { provide: ToastService, useValue: toastSpy }
+        { provide: ToastService, useValue: toastSpy },
+        { provide: ProbeService, useValue: probeSpy }
       ]
     }).compileComponents();
 

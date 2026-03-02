@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://127.0.0.1:5001'  // Update this for production deployment
+  apiUrl: 'http://127.0.0.1:5001',  // Update this for production deployment
+  probeApiKey: 'your_secret_probe_key_here'
 };

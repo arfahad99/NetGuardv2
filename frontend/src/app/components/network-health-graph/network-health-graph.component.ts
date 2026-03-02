@@ -48,21 +48,21 @@ interface GraphPoint {
  * - Responsive design
  */
 @Component({
-    selector: 'app-network-health-graph',
-    imports: [CommonModule],
-    templateUrl: './network-health-graph.component.html',
-    styleUrls: ['./network-health-graph.component.css']
+  selector: 'app-network-health-graph',
+  imports: [CommonModule],
+  templateUrl: './network-health-graph.component.html',
+  styleUrls: ['./network-health-graph.component.css']
 })
 export class NetworkHealthGraphComponent implements OnInit, OnChanges {
   /** Array of network health data to display */
   @Input() data: NetworkHealthData[] = [];
-  
+
   /** Type of metric to display */
   @Input() metric: 'bandwidth' | 'latency' | 'packet_loss' | 'uptime' = 'bandwidth';
-  
+
   /** Height of the graph in pixels */
   @Input() height: number = 300;
-  
+
   graphPoints: GraphPoint[] = [];
   maxValue: number = 100;
   minValue: number = 0;
@@ -107,7 +107,7 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
     };
 
     const range = ranges[this.metric];
-    const demoData = Array.from({ length: 20 }, () => 
+    const demoData = Array.from({ length: 20 }, () =>
       range.min + Math.random() * (range.max - range.min)
     );
 
@@ -125,17 +125,33 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
    * Extracts data points from network health records
    */
   extractDataPoints() {
-    const values = this.data.map(record => {
-      const metrics = record.metrics;
-      switch (this.metric) {
-        case 'bandwidth':
-          return (metrics?.bandwidth?.download_mbps || 0) + (metrics?.bandwidth?.upload_mbps || 0);
-        case 'latency':
-          return metrics?.latency_ms || 0;
-        case 'packet_loss':
-          return metrics?.packet_loss_percent || 0;
-        case 'uptime':
-          return metrics?.uptime_percent || 0;
+    const values = this.data.map((record: any) => {
+      // If data is from DynamoDB probe endpoint (has deviceId)
+      if (record.deviceId !== undefined) {
+        switch (this.metric) {
+          case 'bandwidth':
+            return (record.downloadMbps || 0) + (record.uploadMbps || 0);
+          case 'latency':
+            return record.latencyMs || 0;
+          case 'packet_loss':
+            return record.packetLoss || 0;
+          case 'uptime':
+            return record.uptimeStatus === 'online' ? 100 : 0;
+        }
+      }
+      // If data is from MongoDB backend (has metrics object)
+      else {
+        const metrics = record.metrics;
+        switch (this.metric) {
+          case 'bandwidth':
+            return (metrics?.bandwidth?.download_mbps || 0) + (metrics?.bandwidth?.upload_mbps || 0);
+          case 'latency':
+            return metrics?.latency_ms || 0;
+          case 'packet_loss':
+            return metrics?.packet_loss_percent || 0;
+          case 'uptime':
+            return metrics?.uptime_percent || 0;
+        }
       }
     });
 
@@ -153,7 +169,7 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
 
     const values = this.graphPoints.map(p => p.y);
     const range = Math.max(...values) - Math.min(...values);
-    
+
     this.maxValue = Math.max(...values) + range * 0.1;
     this.minValue = Math.max(0, Math.min(...values) - range * 0.1);
 
@@ -170,7 +186,7 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
 
     const points = this.graphPoints.map(p => ({ x: p.x, y: this.normalizeY(p.y) }));
     let path = `M ${points[0].x} ${points[0].y}`;
-    
+
     for (let i = 0; i < points.length - 1; i++) {
       const controlX = (points[i].x + points[i + 1].x) / 2;
       path += ` Q ${controlX} ${points[i].y}, ${points[i + 1].x} ${points[i + 1].y}`;
