@@ -48,9 +48,12 @@
 
 .status-icon {
   font-size: 3rem;
-  color: #f59e0b;
   margin-bottom: 1rem;
   animation: pulse 2s ease-in-out infinite;
+}
+
+.status-icon.warning {
+  color: #f59e0b;
 }
 
 @keyframes pulse {
@@ -226,15 +229,23 @@
   z-index: 1000;
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .backend-status-indicator.online {
   border-color: rgba(16, 185, 129, 0.3);
   color: #10b981;
+  background: linear-gradient(135deg, var(--card-bg), rgba(16, 185, 129, 0.05));
 }
 
 .backend-status-indicator.online i {
   color: #10b981;
+  font-size: 1rem;
 }
 
 /* Responsive */
