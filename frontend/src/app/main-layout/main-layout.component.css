@@ -1,0 +1,110 @@
+.sidebar {
+  background: var(--dark-bg, #1a1a1a);
+  border-right: 1px solid var(--border-color, #333);
+  height: 100vh;
+  position: relative;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color, #333);
+}
+
+.sidebar-nav {
+  padding: 0 1rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary, #94a3b8);
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--primary-color, #667eea);
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.nav-link i {
+  width: 20px;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+}
+
+.main-content {
+  background: var(--body-bg, #f8f9fa);
+  min-height: 100vh;
+  overflow-x: auto;
+}
+
+/* User profile section */
+.sidebar .border-top {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100% !important;
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background: #0d1117;
+    border-color: #21262d;
+  }
+  
+  .sidebar-brand {
+    border-color: #21262d;
+  }
+  
+  .nav-link {
+    color: #8b949e;
+  }
+  
+  .nav-link:hover {
+    background: rgba(102, 126, 234, 0.15);
+    color: #667eea;
+  }
+}

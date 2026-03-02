@@ -1,0 +1,108 @@
+<div class="graph-container">
+  <div class="graph-header">
+    <h4 class="graph-title">{{ getMetricLabel() }}</h4>
+    <div class="graph-legend">
+      <span class="legend-dot" [style.background]="getMetricColor()"></span>
+      <span class="legend-label">Current Trend</span>
+    </div>
+  </div>
+  
+  <div class="graph-wrapper">
+    <svg 
+      class="graph-svg" 
+      viewBox="0 0 100 100" 
+      preserveAspectRatio="none"
+      [style.height.px]="height">
+      
+      <!-- Definitions -->
+      <defs>
+        <!-- Gradient for area fill -->
+        <linearGradient [id]="getGradientId()" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" [attr.stop-color]="getMetricColor()" stop-opacity="0.3"/>
+          <stop offset="100%" [attr.stop-color]="getMetricColor()" stop-opacity="0.05"/>
+        </linearGradient>
+        
+        <!-- Glow filter -->
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      
+      <!-- Grid lines -->
+      @for (line of gridLines; track line) {
+        <line 
+          class="grid-line"
+          x1="0" 
+          [attr.y1]="normalizeY(line)" 
+          x2="100" 
+          [attr.y2]="normalizeY(line)"
+          stroke="var(--border-color)"
+          stroke-width="0.2"
+          opacity="0.3"/>
+      }
+      
+      <!-- Area fill -->
+      <path 
+        class="graph-area"
+        [attr.d]="areaPathData"
+        [attr.fill]="'url(#' + getGradientId() + ')'"
+        [style.opacity]="animationProgress"/>
+      
+      <!-- Line -->
+      <path 
+        class="graph-line"
+        [attr.d]="pathData"
+        [attr.stroke]="getMetricColor()"
+        stroke-width="0.5"
+        fill="none"
+        filter="url(#glow)"
+        [style.stroke-dasharray]="'100'"
+        [style.stroke-dashoffset]="100 * (1 - animationProgress)"/>
+      
+      <!-- Data points -->
+      @for (point of graphPoints; track point; let i = $index) {
+        <circle 
+          class="graph-point"
+          [attr.cx]="point.x"
+          [attr.cy]="normalizeY(point.y)"
+          r="0.8"
+          [attr.fill]="getMetricColor()"
+          [style.opacity]="animationProgress"
+          [style.animation-delay]="(i * 50) + 'ms'">
+          <title>{{ point.y.toFixed(2) }}</title>
+        </circle>
+      }
+    </svg>
+    
+    <!-- Y-axis labels -->
+    <div class="y-axis-labels">
+      @for (line of gridLines; track line; let i = $index) {
+        <div 
+          class="y-label"
+          [style.bottom.%]="((line - minValue) / (maxValue - minValue)) * 100">
+          {{ line.toFixed(0) }}
+        </div>
+      }
+    </div>
+  </div>
+  
+  <!-- Stats -->
+  <div class="graph-stats">
+    <div class="stat-item">
+      <span class="stat-label">Max</span>
+      <span class="stat-value" [style.color]="getMetricColor()">{{ maxValue.toFixed(1) }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Min</span>
+      <span class="stat-value">{{ minValue.toFixed(1) }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Points</span>
+      <span class="stat-value">{{ graphPoints.length }}</span>
+    </div>
+  </div>
+</div>

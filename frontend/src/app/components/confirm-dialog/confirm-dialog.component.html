@@ -1,0 +1,24 @@
+@if (show) {
+  <div class="modal d-block" style="background: rgba(0,0,0,0.7);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-dark">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title">
+            <i [class]="'bi me-2 ' + (type === 'danger' ? 'bi-exclamation-triangle-fill text-danger' : 'bi-question-circle-fill text-primary')"></i>
+            {{ title }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="onCancel()"></button>
+        </div>
+        <div class="modal-body py-4">
+          <p class="mb-0">{{ message }}</p>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-outline-light rounded-pill" (click)="onCancel()">Cancel</button>
+          <button type="button" [class]="'btn rounded-pill ' + (type === 'danger' ? 'btn-danger' : 'btn-primary')" (click)="onConfirm()">
+            {{ confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

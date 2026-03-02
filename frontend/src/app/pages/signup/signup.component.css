@@ -1,0 +1,179 @@
+/* Signup page specific styles */
+.min-vh-100 {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1d29 0%, #2d3250 100%);
+}
+
+/* Logo circle */
+.rounded-circle {
+  background: var(--primary-gradient) !important;
+}
+
+/* Card styling */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+/* Form validation styles */
+.form-control.is-valid {
+  border-color: #38ef7d;
+  background-image: none;
+}
+
+.form-control.is-invalid {
+  border-color: #f45c43;
+  background-image: none;
+}
+
+.valid-feedback {
+  color: #38ef7d;
+  font-size: 0.875rem;
+}
+
+.invalid-feedback {
+  color: #f45c43;
+  font-size: 0.875rem;
+}
+
+/* Password strength progress bar */
+.progress {
+  background: var(--dark-bg) !important;
+  border-radius: 3px;
+}
+
+.progress-bar.bg-danger {
+  background: linear-gradient(90deg, #f45c43, #eb3349) !important;
+}
+
+.progress-bar.bg-warning {
+  background: linear-gradient(90deg, #ffc107, #ff8c00) !important;
+}
+
+.progress-bar.bg-success {
+  background: linear-gradient(90deg, #38ef7d, #11998e) !important;
+}
+
+/* Input group styling */
+.input-group-text {
+  background: var(--dark-bg);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.input-group-text:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Button styling */
+.btn-gradient {
+  background: var(--primary-gradient);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-gradient:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Link styling */
+a {
+  color: #667eea !important;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #5a67d8 !important;
+}
+
+/* Light mode adjustments */
+body.light-mode .min-vh-100 {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+body.light-mode .card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .text-white {
+  color: #1a202c !important;
+}
+
+body.light-mode .text-secondary {
+  color: #64748b !important;
+}
+
+body.light-mode .form-control-dark {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #1a202c;
+}
+
+body.light-mode .input-group-text {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+body.light-mode .progress {
+  background: #e2e8f0 !important;
+}
+/* Server error alert styling */
+.alert-danger {
+  background: rgba(244, 92, 67, 0.1);
+  border: 1px solid rgba(244, 92, 67, 0.3);
+  color: #f45c43;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.alert-danger i {
+  color: #f45c43;
+  font-size: 1rem;
+}
+
+/* Light mode alert adjustments */
+body.light-mode .alert-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+body.light-mode .alert-danger i {
+  color: #dc2626;
+}
+
+/* Enhanced field error styling for server errors */
+.form-control.is-invalid.server-error {
+  border-color: #f45c43;
+  box-shadow: 0 0 0 0.2rem rgba(244, 92, 67, 0.25);
+}
+
+body.light-mode .form-control.is-invalid.server-error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+}

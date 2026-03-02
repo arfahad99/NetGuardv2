@@ -1,0 +1,89 @@
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1 fw-bold">
+        <i class="bi bi-people-fill me-2 text-primary"></i>
+        User Management
+      </h2>
+      <p class="text-secondary mb-0">Manage user accounts and permissions</p>
+    </div>
+    <button class="btn btn-primary" (click)="createUser()">
+      <i class="bi bi-plus-circle me-2"></i>
+      Create User
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-secondary mt-2">Loading users...</p>
+  </div>
+
+  <!-- Users Table -->
+  <div *ngIf="!loading" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th class="px-4 py-3">Username</th>
+              <th class="px-4 py-3">Email</th>
+              <th class="px-4 py-3">Role</th>
+              <th class="px-4 py-3 text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar me-2">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  <span class="fw-semibold">{{ user.username }}</span>
+                  <span *ngIf="isCurrentUser(user)" class="badge bg-info ms-2">You</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-secondary">{{ user.email }}</td>
+              <td class="px-4 py-3">
+                <span *ngIf="user.admin" class="badge badge-admin">
+                  <i class="bi bi-shield-check me-1"></i>
+                  Administrator
+                </span>
+                <span *ngIf="!user.admin" class="badge badge-user">
+                  <i class="bi bi-person-check me-1"></i>
+                  Standard User
+                </span>
+              </td>
+              <td class="px-4 py-3 text-end">
+                <button 
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="editUser(user)"
+                  title="Edit user">
+                  <i class="bi bi-pencil"></i>
+                  Edit
+                </button>
+                <button 
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteUser(user)"
+                  [disabled]="isCurrentUser(user)"
+                  [title]="isCurrentUser(user) ? 'Cannot delete your own account' : 'Delete user'">
+                  <i class="bi bi-trash"></i>
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="users.length === 0" class="text-center py-5">
+        <i class="bi bi-people display-1 text-secondary opacity-50"></i>
+        <p class="text-secondary mt-3">No users found</p>
+      </div>
+    </div>
+  </div>
+</div>

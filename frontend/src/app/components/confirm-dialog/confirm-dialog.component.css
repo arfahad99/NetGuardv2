@@ -1,0 +1,54 @@
+.modal-dark {
+  background: var(--card-bg, #1a1a1a);
+  border: 1px solid var(--border-color, #333);
+  color: var(--text-color, #ffffff);
+}
+
+.modal-header {
+  border-color: var(--border-color, #333) !important;
+}
+
+.modal-footer {
+  border-color: var(--border-color, #333) !important;
+}
+
+.modal-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.modal-body p {
+  color: var(--text-muted, #b3b3b3);
+  line-height: 1.5;
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Animation */
+.modal {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-dialog {
+  animation: slideIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

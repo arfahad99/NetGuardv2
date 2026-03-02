@@ -1,0 +1,87 @@
+.stat-link {
+  color: #667eea;
+}
+
+.stat-link-danger {
+  color: #f45c43;
+}
+
+.stat-link-success {
+  color: #38ef7d;
+}
+
+.stat-link-warning {
+  color: #f2c94c;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  background: var(--dark-bg);
+}
+
+.alert-item .fw-semibold {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.alert-item .text-secondary {
+  color: var(--text-secondary) !important;
+  opacity: 0.9;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  background: var(--dark-bg);
+}
+
+.device-item .fw-semibold {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.device-item .text-secondary {
+  color: var(--text-secondary) !important;
+  opacity: 0.9;
+}
+
+.device-icon {
+  width: 45px;
+  height: 45px;
+  font-size: 1rem;
+}
+
+/* Make card headings more visible */
+h5.fw-bold {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Make card headers stand out */
+.card-header h5 {
+  color: var(--text-primary) !important;
+}
+
+/* Light mode specific adjustments */
+body.light-mode .alert-item,
+body.light-mode .device-item {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+}
+
+body.light-mode .alert-item .fw-semibold,
+body.light-mode .device-item .fw-semibold {
+  color: #2d3748;
+}
+
+body.light-mode .alert-item .text-secondary,
+body.light-mode .device-item .text-secondary {
+  color: #718096 !important;
+}

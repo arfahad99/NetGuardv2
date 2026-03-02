@@ -1,0 +1,187 @@
+.graph-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.graph-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.graph-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.graph-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.graph-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+  padding-left: 45px; /* Space for Y-axis labels */
+}
+
+.graph-svg {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+}
+
+.grid-line {
+  stroke-dasharray: 2, 2;
+}
+
+.graph-area {
+  transition: opacity 0.3s ease;
+}
+
+.graph-line {
+  transition: stroke-dashoffset 1.5s ease-out;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.graph-point {
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  animation: point-appear 0.5s ease-out forwards;
+}
+
+@keyframes point-appear {
+  0% {
+    r: 0;
+    opacity: 0;
+  }
+  50% {
+    r: 1.2;
+  }
+  100% {
+    r: 0.8;
+    opacity: 1;
+  }
+}
+
+.graph-point:hover {
+  r: 1.5;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Y-axis labels */
+.y-axis-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+}
+
+.y-label {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* Stats */
+.graph-stats {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Dark mode enhancements */
+body.dark-mode .graph-container {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .graph-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .graph-line {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Light mode enhancements */
+body.light-mode .graph-container {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .graph-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .graph-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .graph-wrapper {
+    padding-left: 35px;
+  }
+  
+  .y-axis-labels {
+    width: 30px;
+  }
+  
+  .y-label {
+    font-size: 0.625rem;
+  }
+}

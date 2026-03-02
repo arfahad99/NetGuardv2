@@ -1,0 +1,134 @@
+/* Alerts specific styles */
+.page-header {
+  background: var(--danger-gradient) !important;
+}
+
+/* Severity badge styles */
+.badge-status.badge-critical {
+  background: rgba(244, 92, 67, 0.2);
+  color: #f45c43;
+  animation: pulse-critical 2s infinite;
+}
+
+.badge-status.badge-warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.badge-status.badge-active {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+}
+
+.badge-status.badge-online {
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+}
+
+/* Critical alert pulsing animation */
+@keyframes pulse-critical {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(244, 92, 67, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(244, 92, 67, 0);
+  }
+}
+
+/* Alert message truncation */
+.text-secondary {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Device info styling */
+td:nth-child(4) {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* Danger gradient button */
+.btn-gradient-danger {
+  background: var(--danger-gradient);
+  border: none;
+  color: white;
+}
+
+.btn-gradient-danger:hover {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  color: white;
+}
+
+/* Modal customizations */
+.modal-dark {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* Textarea styling */
+textarea.form-control-dark {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Light mode adjustments */
+body.light-mode .page-header {
+  color: white !important;
+}
+
+body.light-mode .page-header .opacity-75 {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.light-mode .modal-dark {
+  background: #ffffff;
+  color: #333;
+}
+
+body.light-mode .modal-header,
+body.light-mode .modal-footer {
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .text-secondary {
+  color: #64748b !important;
+}
+
+body.light-mode .empty-state {
+  color: #64748b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .text-secondary {
+    max-width: 150px;
+  }
+  
+  td:nth-child(4) {
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,112 @@
+/* Main content area - adjust for header and sidebar */
+.main-content {
+  margin-top: 50px; /* Header height */
+  margin-left: 70px; /* Collapsed sidebar width */
+  min-height: calc(100vh - 50px);
+  display: flex;
+  flex-direction: column;
+  background: var(--body-bg);
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Adjust for larger header heights */
+@media (min-width: 1280px) {
+  .main-content {
+    margin-top: 56px;
+    min-height: calc(100vh - 56px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .main-content {
+    margin-top: 58px;
+    min-height: calc(100vh - 58px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .main-content {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
+}
+
+/* Expanded sidebar adjustment */
+@media (min-width: 1200px) {
+  .main-content.sidebar-expanded {
+    margin-left: 280px; /* Expanded sidebar width */
+  }
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Mobile adjustments - no sidebar margin */
+@media (max-width: 1199px) {
+  .main-content {
+    margin-left: 0; /* No sidebar on mobile */
+  }
+  
+  .content-wrapper {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 0.5rem;
+  }
+}
+/* Additional responsive adjustments for header/footer layout */
+@media (max-width: 576px) {
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 0.5rem;
+  }
+}
+
+/* Ensure proper spacing for pages with their own headers */
+.content-wrapper .page-header:first-child {
+  margin-top: 0;
+}
+
+
+
+/* Smooth transitions for layout changes */
+* {
+  box-sizing: border-box;
+}
+
+.main-content,
+.content-wrapper {
+  transition: all 0.3s ease;
+}
+
+/* Print styles - hide header/footer when printing */
+@media print {
+  .app-header,
+  .app-footer {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin: 0 !important;
+  }
+  
+  .content-wrapper {
+    padding: 0 !important;
+  }
+}

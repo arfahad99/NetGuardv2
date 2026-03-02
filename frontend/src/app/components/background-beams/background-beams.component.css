@@ -1,0 +1,191 @@
+.background-beams-container {
+  height: 28rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 20px;
+  margin: 20px 0;
+  transition: background 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .background-beams-container {
+    height: 35rem;
+  }
+}
+
+/* Dark mode - matches your project theme */
+:host-context(body.dark-mode) .background-beams-container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+/* Light mode */
+:host-context(body.light-mode) .background-beams-container {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.background-beams-container.network-theme {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Beam styles */
+.beam {
+  position: absolute;
+  left: 0;
+  top: 5rem;
+  margin: auto;
+  height: 3.5rem;
+  width: 1px;
+  border-radius: 9999px;
+  background: linear-gradient(to top, #667eea, #764ba2, transparent);
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+/* Beam visibility in light mode */
+:host-context(body.light-mode) .beam {
+  background: linear-gradient(to top, #4c5eb8, #5a3d7a, transparent);
+  box-shadow: 0 0 10px rgba(76, 94, 184, 0.6);
+}
+
+.beam.h-6 {
+  height: 1.5rem;
+}
+
+.beam.h-12 {
+  height: 3rem;
+}
+
+.beam.h-20 {
+  height: 5rem;
+}
+
+.beam.animating {
+  animation: beam-fall linear infinite;
+  opacity: 1;
+}
+
+@keyframes beam-fall {
+  0% {
+    transform: translateY(-200px);
+  }
+  100% {
+    transform: translateY(1800px);
+  }
+}
+
+/* Content wrapper */
+.content-wrapper {
+  position: relative;
+  z-index: 20;
+}
+
+/* Bottom container */
+.bottom-container {
+  position: absolute;
+  bottom: 0;
+  background: rgba(26, 26, 46, 0.8);
+  width: 100%;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  height: 80px;
+  box-shadow: 
+    0 -4px 24px rgba(102, 126, 234, 0.15),
+    0 1px 1px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(102, 126, 234, 0.15),
+    0 -8px 32px rgba(102, 126, 234, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+:host-context(body.dark-mode) .bottom-container {
+  background: rgba(26, 26, 46, 0.8);
+  box-shadow: 
+    0 -4px 24px rgba(102, 126, 234, 0.15),
+    0 1px 1px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(102, 126, 234, 0.15),
+    0 -8px 32px rgba(102, 126, 234, 0.1);
+}
+
+:host-context(body.light-mode) .bottom-container {
+  background: rgba(245, 245, 245, 0.8);
+  box-shadow: 
+    0 -4px 24px rgba(102, 126, 234, 0.1),
+    0 1px 1px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(102, 126, 234, 0.1),
+    0 -8px 32px rgba(102, 126, 234, 0.05);
+}
+
+/* Explosion styles */
+.explosion {
+  position: absolute;
+  z-index: 50;
+  height: 0.5rem;
+  width: 0.5rem;
+  animation: explosion-fade 1.5s ease-out forwards;
+}
+
+@keyframes explosion-fade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.explosion-line {
+  position: absolute;
+  left: -2.5rem;
+  right: -2.5rem;
+  top: 0;
+  margin: auto;
+  height: 0.5rem;
+  width: 2.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(to right, transparent, #667eea, transparent);
+  filter: blur(4px);
+}
+
+:host-context(body.light-mode) .explosion-line {
+  background: linear-gradient(to right, transparent, #4c5eb8, transparent);
+}
+
+.explosion-particle {
+  position: absolute;
+  height: 0.25rem;
+  width: 0.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, #667eea, #764ba2);
+  animation: particle-explode 1s ease-out forwards;
+  box-shadow: 0 0 4px rgba(102, 126, 234, 0.8);
+}
+
+:host-context(body.light-mode) .explosion-particle {
+  background: linear-gradient(to bottom, #4c5eb8, #5a3d7a);
+  box-shadow: 0 0 4px rgba(76, 94, 184, 0.8);
+}
+
+@keyframes particle-explode {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--direction-x), var(--direction-y));
+    opacity: 0;
+  }
+}
+
+/* Ensure Math is available in template */
+:host {
+  display: block;
+}

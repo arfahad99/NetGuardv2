@@ -1,0 +1,710 @@
+/* Burger Menu Button in Header */
+.sidebar-header .burger-menu-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+
+.sidebar-header .burger-menu-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+}
+
+.sidebar-header .burger-menu-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.sidebar-header .burger-menu-btn:active,
+.sidebar-header .burger-menu-btn[aria-expanded="true"] {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #667eea;
+}
+
+/* Burger Icon */
+.burger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 16px;
+  height: 12px;
+  position: relative;
+}
+
+.burger-line {
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animated burger to X */
+.burger-icon.active .burger-line:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.burger-icon.active .burger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.burger-icon.active .burger-line:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* Desktop Sidebar */
+.collapsible-sidebar {
+  position: fixed;
+  left: 0;
+  top: 50px; /* Below header */
+  height: calc(100vh - 50px);
+  width: 70px; /* Collapsed width */
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  z-index: 999; /* Below header */
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Adjust sidebar for larger header heights */
+@media (min-width: 1280px) {
+  .collapsible-sidebar {
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .collapsible-sidebar {
+    top: 58px;
+    height: calc(100vh - 58px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .collapsible-sidebar {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+}
+
+/* Expanded state */
+.collapsible-sidebar.expanded {
+  width: 280px;
+}
+
+/* Mobile sidebar */
+.collapsible-sidebar.mobile {
+  top: 0;
+  height: 100vh;
+  width: 280px;
+  transform: translateX(-100%);
+  z-index: 1001;
+  box-shadow: var(--shadow-xl);
+}
+
+.collapsible-sidebar.mobile-open {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  min-height: 70px;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.brand.collapsed {
+  justify-content: center;
+}
+
+/* When sidebar is collapsed, center the burger menu */
+.collapsible-sidebar:not(.expanded):not(.mobile) .sidebar-header {
+  justify-content: center;
+  padding: 1rem 0.5rem;
+}
+
+.collapsible-sidebar:not(.expanded):not(.mobile) .sidebar-header .burger-menu-btn {
+  margin-right: 0;
+}
+
+.collapsible-sidebar:not(.expanded):not(.mobile) .brand {
+  display: none;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.sidebar-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.sidebar-toggle i {
+  font-size: 0.875rem;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-toggle i.rotated {
+  transform: rotate(180deg);
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.nav-link:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.nav-link.active {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-link.active .nav-icon {
+  color: white;
+}
+
+.nav-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.nav-text {
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide text when collapsed */
+.collapsible-sidebar:not(.expanded):not(.mobile) .nav-text {
+  display: none;
+}
+
+.collapsible-sidebar:not(.expanded):not(.mobile) .nav-link {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Theme Toggle */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.theme-toggle-btn i {
+  font-size: 1.125rem;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover i {
+  transform: rotate(20deg);
+}
+
+.theme-text {
+  transition: opacity 0.3s ease;
+}
+
+/* Hide theme text when collapsed */
+.collapsible-sidebar:not(.expanded):not(.mobile) .theme-text {
+  display: none;
+}
+
+.collapsible-sidebar:not(.expanded):not(.mobile) .theme-toggle-btn {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+/* User Info Section */
+.user-info {
+  position: relative;
+}
+
+.user-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.user-toggle:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-avatar i {
+  font-size: 1.5rem;
+  color: #667eea;
+}
+
+.user-details {
+  flex: 1;
+  overflow: hidden;
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.user-role.role-administrator {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.user-role.role-standard {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.user-role.role-guest {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+}
+
+.dropdown-arrow {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* Hide user details when collapsed */
+.user-info.collapsed .user-details,
+.user-info.collapsed .dropdown-arrow {
+  display: none;
+}
+
+.user-info.collapsed .user-toggle {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+/* User Dropdown */
+.user-dropdown {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-xl);
+  z-index: 1002;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.user-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.dropdown-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.sign-out-btn {
+  color: #ef4444;
+}
+
+.sign-out-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.dropdown-btn i {
+  font-size: 1rem;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+
+
+/* Mobile Backdrop */
+.mobile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scrollbar Styling */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Firefox scrollbar */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1199px) {
+  .collapsible-sidebar:not(.mobile) {
+    display: none;
+  }
+  
+  /* Show mobile sidebar on smaller screens */
+  .collapsible-sidebar.mobile {
+    display: flex;
+  }
+}
+
+@media (min-width: 1200px) {
+  .collapsible-sidebar.mobile {
+    display: none;
+  }
+  
+  .mobile-backdrop {
+    display: none;
+  }
+}
+
+/* Accessibility and Animation Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .collapsible-sidebar,
+  .user-dropdown,
+  .dropdown-arrow,
+  .dropdown-btn,
+  .nav-link,
+  .theme-toggle-btn,
+  .sidebar-toggle,
+  .mobile-backdrop {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .collapsible-sidebar {
+    border-width: 2px;
+  }
+  
+  .nav-link,
+  .theme-toggle-btn,
+  .user-toggle,
+  .dropdown-btn {
+    border: 1px solid transparent;
+  }
+  
+  .nav-link:hover,
+  .theme-toggle-btn:hover,
+  .user-toggle:hover,
+  .dropdown-btn:hover {
+    border-color: currentColor;
+  }
+}
+
+/* Focus styles for accessibility */
+.nav-link:focus,
+.theme-toggle-btn:focus,
+.user-toggle:focus,
+.dropdown-btn:focus,
+.sidebar-toggle:focus,
+.mobile-menu-btn:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Light mode adjustments */
+body.light-mode .user-dropdown {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .dropdown-btn {
+  color: #4a5568;
+}
+
+body.light-mode .dropdown-btn:hover {
+  background: rgba(102, 126, 234, 0.05);
+  color: #667eea;
+}
+
+body.light-mode .sign-out-btn:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Smooth animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.collapsible-sidebar.mobile-open {
+  animation: slideIn 0.3s ease-out;
+}
+/* Responsive Burger Menu Styles */
+@media (max-width: 480px) {
+  .sidebar-header .burger-menu-btn {
+    width: 28px;
+    height: 28px;
+    margin-right: 0.5rem;
+  }
+  
+  .burger-icon {
+    width: 14px;
+    height: 10px;
+  }
+  
+  .burger-line {
+    height: 1.5px;
+  }
+  
+  .burger-icon.active .burger-line:nth-child(1) {
+    transform: translateY(4px) rotate(45deg);
+  }
+  
+  .burger-icon.active .burger-line:nth-child(3) {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar-header .burger-menu-btn {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.25rem;
+  }
+  
+  .burger-icon {
+    width: 12px;
+    height: 8px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .burger-line,
+  .burger-icon.active .burger-line {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .burger-menu-btn {
+    border-width: 2px;
+  }
+  
+  .burger-line {
+    height: 3px;
+  }
+}

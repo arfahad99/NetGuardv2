@@ -1,0 +1,152 @@
+<div class="page-header" style="background: var(--warning-gradient);">
+  <div class="row align-items-center">
+    <div class="col">
+      <h2 class="mb-1 fw-bold text-dark"><i class="bi bi-clock-history me-2"></i>Sessions</h2>
+      <p class="mb-0 opacity-75 text-dark">User session management</p>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-dark rounded-pill px-4" (click)="openModal()" *ngIf="auth.canEdit()"><i class="bi bi-plus-lg me-2"></i>Add Session</button>
+      <div *ngIf="auth.isGuest()" class="alert alert-info mb-0 py-2 px-3"><i class="bi bi-info-circle me-2"></i><small>Guest users have read-only access</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control form-control-dark" placeholder="Search sessions..." [(ngModel)]="searchTerm" (input)="filterSessions()">
+    </div>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select form-control-dark" [(ngModel)]="filterDay" (change)="filterSessions()">
+      <option value="">All Days</option>
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+      <option value="Saturday">Saturday</option>
+      <option value="Sunday">Sunday</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select form-control-dark" [(ngModel)]="filterPeak" (change)="filterSessions()">
+      <option value="">All Hours</option>
+      <option value="true">Peak Hours</option>
+      <option value="false">Off-Peak</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-dark-custom mb-0">
+      <thead><tr><th>Session</th><th>User</th><th>Day/Time</th><th>Duration</th><th>Latency</th><th>Peak</th><th>Actions</th></tr></thead>
+      <tbody>
+        @if (loading) {
+          <tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+        } @else if (filteredSessions.length === 0) {
+          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-clock"></i><p>No sessions found</p></div></td></tr>
+        } @else {
+          @for (session of filteredSessions; track session._id) {
+            <tr>
+              <td><div class="fw-semibold">{{ session.session_id }}</div></td>
+              <td><span class="badge bg-secondary rounded-pill">{{ session.user_ref?.user_id }}</span></td>
+              <td>
+                <div>{{ session.context?.temporal?.day_of_week }}</div>
+                <small class="text-secondary">{{ session.context?.temporal?.time_segment }} ({{ session.context?.temporal?.hour }}:00)</small>
+              </td>
+              <td>{{ session.metrics_summary?.duration_sec || 0 }}s</td>
+              <td>{{ session.metrics_summary?.avg_latency_ms || 0 }} ms</td>
+              <td>
+                <span [class]="'badge-status badge-' + (session.context?.temporal?.is_peak_hour ? 'warning' : 'online')">
+                  {{ session.context?.temporal?.is_peak_hour ? 'Peak' : 'Off-Peak' }}
+                </span>
+              </td>
+              <td>
+                <button class="action-btn view me-1" (click)="viewSession(session)" title="View"><i class="bi bi-eye"></i></button>
+                <button class="action-btn edit me-1" (click)="editSession(session)" *ngIf="auth.canEdit()" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="action-btn delete" (click)="deleteSession(session._id)" *ngIf="auth.canDelete()" title="Delete"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+  <span class="text-secondary">Showing {{ filteredSessions.length }} sessions</span>
+  <div>
+    <button class="btn btn-outline-light rounded-pill me-2" [disabled]="currentPage === 1" (click)="changePage(-1)"><i class="bi bi-chevron-left"></i> Previous</button>
+    <button class="btn btn-outline-light rounded-pill" (click)="changePage(1)">Next <i class="bi bi-chevron-right"></i></button>
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal d-block" style="background: rgba(0,0,0,0.7);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content modal-dark">
+        <div class="modal-header border-bottom" style="border-color: var(--border-color) !important;">
+          <h5 class="modal-title">{{ isEditing ? 'Edit Session' : (isViewing ? 'Session Details' : 'Add Session') }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          @if (isViewing) {
+            <div class="row g-3">
+              <div class="col-6"><label class="text-secondary">Session ID</label><p class="fw-semibold">{{ selectedSession?.session_id }}</p></div>
+              <div class="col-6"><label class="text-secondary">User ID</label><p class="fw-semibold">{{ selectedSession?.user_ref?.user_id }}</p></div>
+              <div class="col-4"><label class="text-secondary">Day</label><p class="fw-semibold">{{ selectedSession?.context?.temporal?.day_of_week }}</p></div>
+              <div class="col-4"><label class="text-secondary">Duration</label><p class="fw-semibold">{{ selectedSession?.metrics_summary?.duration_sec }}s</p></div>
+              <div class="col-4"><label class="text-secondary">Latency</label><p class="fw-semibold">{{ selectedSession?.metrics_summary?.avg_latency_ms }} ms</p></div>
+            </div>
+          } @else {
+            <form>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label text-secondary">Session ID *</label>
+                  <input type="text" class="form-control form-control-dark" [(ngModel)]="form.session_id" name="session_id">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-secondary">User ID *</label>
+                  <input type="text" class="form-control form-control-dark" [(ngModel)]="form.user_id" name="user_id">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Day of Week</label>
+                  <select class="form-select form-control-dark" [(ngModel)]="form.day_of_week" name="day_of_week">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Duration (sec)</label>
+                  <input type="number" class="form-control form-control-dark" [(ngModel)]="form.duration_sec" name="duration_sec">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Avg Latency (ms)</label>
+                  <input type="number" class="form-control form-control-dark" [(ngModel)]="form.avg_latency_ms" name="avg_latency_ms">
+                </div>
+              </div>
+            </form>
+          }
+        </div>
+        <div class="modal-footer border-top" style="border-color: var(--border-color) !important;">
+          <button type="button" class="btn btn-outline-light rounded-pill" (click)="closeModal()">{{ isViewing ? 'Close' : 'Cancel' }}</button>
+          @if (!isViewing) {
+            <button type="button" class="btn btn-gradient" style="background: var(--warning-gradient); color: #000;" (click)="saveSession()" [disabled]="saving">
+              @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+              {{ isEditing ? 'Update' : 'Create' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,179 @@
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <h2 class="mb-1 fw-bold">Dashboard Overview</h2>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <p class="mb-0 opacity-75">Your network is</p>
+        <app-text-flip 
+          [words]="['Healthy', 'Secure', 'Optimized', 'Protected']"
+          [interval]="3000"
+        ></app-text-flip>
+      </div>
+    </div>
+    <div class="col-auto">
+      <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+        <i class="bi bi-clock me-2"></i>{{ currentTime }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-xl-3">
+    <div class="stat-card primary">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <p class="text-secondary mb-1">Total Devices</p>
+          <h2 class="mb-0 fw-bold">{{ stats.devices }}</h2>
+        </div>
+        <div class="stat-icon primary"><i class="bi bi-pc-display"></i></div>
+      </div>
+      <a routerLink="/devices" class="text-decoration-none d-block mt-3 stat-link">
+        View all <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="stat-card danger">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <p class="text-secondary mb-1">Active Alerts</p>
+          <h2 class="mb-0 fw-bold">{{ stats.alerts }}</h2>
+        </div>
+        <div class="stat-icon danger"><i class="bi bi-bell-fill"></i></div>
+      </div>
+      <a routerLink="/alerts" class="text-decoration-none d-block mt-3 stat-link-danger">
+        View all <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="stat-card success">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <p class="text-secondary mb-1">Network Health</p>
+          <h2 class="mb-0 fw-bold">{{ stats.networkHealth }}</h2>
+        </div>
+        <div class="stat-icon success"><i class="bi bi-heart-pulse-fill"></i></div>
+      </div>
+      <a routerLink="/network-health" class="text-decoration-none d-block mt-3 stat-link-success">
+        View all <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="stat-card warning">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <p class="text-secondary mb-1">Active Sessions</p>
+          <h2 class="mb-0 fw-bold">{{ stats.sessions }}</h2>
+        </div>
+        <div class="stat-icon warning"><i class="bi bi-clock-history"></i></div>
+      </div>
+      <a routerLink="/sessions" class="text-decoration-none d-block mt-3 stat-link-warning">
+        View all <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Network Health Graphs -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <app-network-health-graph 
+      [data]="networkHealthData" 
+      metric="bandwidth"
+      [height]="250">
+    </app-network-health-graph>
+  </div>
+  <div class="col-lg-6">
+    <app-network-health-graph 
+      [data]="networkHealthData" 
+      metric="latency"
+      [height]="250">
+    </app-network-health-graph>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <app-network-health-graph 
+      [data]="networkHealthData" 
+      metric="uptime"
+      [height]="250">
+    </app-network-health-graph>
+  </div>
+  <div class="col-lg-6">
+    <app-network-health-graph 
+      [data]="networkHealthData" 
+      metric="packet_loss"
+      [height]="250">
+    </app-network-health-graph>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Alerts -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4 px-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-bell-fill me-2 text-danger"></i>Recent Alerts</h5>
+        <a routerLink="/alerts" class="btn btn-sm btn-outline-light rounded-pill">View All</a>
+      </div>
+      <div class="card-body px-4">
+        @if (loading) {
+          <div class="loading-spinner"><div class="spinner-border text-primary"></div></div>
+        } @else if (recentAlerts.length === 0) {
+          <div class="empty-state py-4"><i class="bi bi-bell-slash"></i><p>No alerts found</p></div>
+        } @else {
+          @for (alert of recentAlerts; track alert._id) {
+            <div class="alert-item">
+              <div class="me-3">
+                <app-status-badge [status]="alert.severity"></app-status-badge>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold">{{ alert.type }}</div>
+                <small class="text-secondary">{{ alert.message | slice:0:50 }}...</small>
+              </div>
+              <app-status-badge [status]="alert.status === 'active' ? 'active' : 'online'" [label]="alert.status"></app-status-badge>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Devices -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4 px-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-pc-display me-2 text-primary"></i>Recent Devices</h5>
+        <a routerLink="/devices" class="btn btn-sm btn-outline-light rounded-pill">View All</a>
+      </div>
+      <div class="card-body px-4">
+        @if (loading) {
+          <div class="loading-spinner"><div class="spinner-border text-primary"></div></div>
+        } @else if (recentDevices.length === 0) {
+          <div class="empty-state py-4"><i class="bi bi-pc-display-horizontal"></i><p>No devices found</p></div>
+        } @else {
+          @for (device of recentDevices; track device._id) {
+            <div class="device-item">
+              <div class="stat-icon primary me-3 device-icon">
+                <i class="bi bi-hdd-network"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold">{{ device.name }}</div>
+                <small class="text-secondary">{{ device.type }} • {{ device.network?.primary_ip || 'N/A' }}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="pulse-dot me-2" [class.online]="device.status?.state === 'online'" [class.offline]="device.status?.state !== 'online'"></span>
+                <app-status-badge [status]="device.status?.state || 'unknown'"></app-status-badge>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

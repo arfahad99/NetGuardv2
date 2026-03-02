@@ -1,0 +1,65 @@
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.badge-admin {
+  background: rgba(242, 201, 76, 0.2);
+  color: #f2c94c;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+}
+
+.badge-user {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+}
+
+.table thead th {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+.btn-outline-danger:hover {
+  background: var(--danger-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+.btn-outline-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

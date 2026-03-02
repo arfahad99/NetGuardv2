@@ -1,0 +1,121 @@
+.stateful-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Full width variant */
+.stateful-button.w-100 {
+  width: 100%;
+}
+
+.stateful-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.stateful-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.stateful-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.stateful-button.loading {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stateful-button.success {
+  background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.spinner {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.check {
+  animation: checkPulse 0.3s ease-out;
+}
+
+@keyframes checkPulse {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button-text {
+  white-space: nowrap;
+}
+
+/* Alternative green button style */
+.stateful-button.btn-green {
+  background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+}
+
+.stateful-button.btn-green:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(56, 239, 125, 0.4);
+}
+
+/* Alternative red button style */
+.stateful-button.btn-red {
+  background: linear-gradient(135deg, #f45c43 0%, #eb3349 100%);
+}
+
+.stateful-button.btn-red:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(244, 92, 67, 0.4);
+}
+
+/* Small size */
+.stateful-button.btn-sm {
+  min-width: 100px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Large size */
+.stateful-button.btn-lg {
+  min-width: 150px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+}

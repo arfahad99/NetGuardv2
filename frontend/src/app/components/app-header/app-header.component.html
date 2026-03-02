@@ -1,0 +1,133 @@
+<header class="app-header" role="banner" [attr.data-screen-size]="screenSize">
+  <div class="header-container">
+    <!-- Mobile Menu Button (only on mobile/tablet) -->
+    <button 
+      *ngIf="isMobile || isTablet"
+      class="mobile-menu-btn"
+      (click)="toggleMobileMenu()"
+      [attr.aria-label]="isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'"
+      [attr.aria-expanded]="isMobileMenuOpen"
+      type="button"
+      role="button">
+      <div class="burger-icon" [class.active]="isMobileMenuOpen">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+      </div>
+    </button>
+
+    <!-- Logo Section -->
+    <div class="header-brand" role="img" aria-label="NetworkPro Management Dashboard">
+      <div class="brand-logo" [attr.aria-hidden]="true">
+        <i class="bi bi-hdd-network-fill"></i>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-title">NetworkPro</h1>
+        <span class="brand-subtitle">Management Dashboard</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" [class.compact]="needsCompactNavigation()" role="navigation" aria-label="Main navigation">
+      <a 
+        routerLink="/home" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Home page'"
+        [attr.title]="isSmallScreen ? 'Home' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/home'"
+      >
+        <i class="bi bi-house-fill"></i>
+        <span>Home</span>
+      </a>
+      <a 
+        routerLink="/dashboard" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Dashboard page'"
+        [attr.title]="isSmallScreen ? 'Dashboard' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/dashboard'"
+      >
+        <i class="bi bi-speedometer2"></i>
+        <span>{{ getNavLabel('Dashboard') }}</span>
+      </a>
+      <a 
+        routerLink="/devices" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Devices page'"
+        [attr.title]="isSmallScreen ? 'Devices' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/devices'"
+      >
+        <i class="bi bi-router-fill"></i>
+        <span>Devices</span>
+      </a>
+      <a 
+        routerLink="/alerts" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Alerts page'"
+        [attr.title]="isSmallScreen ? 'Alerts' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/alerts'"
+      >
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>Alerts</span>
+      </a>
+      <a 
+        routerLink="/network-health" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Network Health page'"
+        [attr.title]="isSmallScreen ? 'Network Health' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/network-health'"
+      >
+        <i class="bi bi-activity"></i>
+        <span>{{ getNavLabel('Network Health') }}</span>
+      </a>
+      <a 
+        routerLink="/qos-events" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to QoS Events page'"
+        [attr.title]="isSmallScreen ? 'QoS Events' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/qos-events'"
+      >
+        <i class="bi bi-graph-up"></i>
+        <span>{{ getNavLabel('QoS Events') }}</span>
+      </a>
+      <a 
+        routerLink="/sessions" 
+        routerLinkActive="active" 
+        class="nav-tab"
+        [attr.aria-label]="'Navigate to Sessions page'"
+        [attr.title]="isSmallScreen ? 'Sessions' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/sessions'"
+      >
+        <i class="bi bi-people-fill"></i>
+        <span>{{ getNavLabel('Sessions') }}</span>
+      </a>
+      <a 
+        routerLink="/manage-users" 
+        routerLinkActive="active" 
+        class="nav-tab admin-only" 
+        *ngIf="authService.isAdmin()"
+        [attr.aria-label]="'Navigate to User Management page (Admin only)'"
+        [attr.title]="isSmallScreen ? 'User Management' : null"
+        role="tab"
+        [attr.aria-selected]="router.url === '/manage-users'"
+      >
+        <i class="bi bi-person-gear"></i>
+        <span>{{ getNavLabel('User Management') }}</span>
+      </a>
+    </nav>
+
+
+  </div>
+</header>

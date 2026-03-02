@@ -1,0 +1,10 @@
+<button 
+  class="theme-toggle-btn"
+  (click)="toggleTheme()"
+  [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+  title="{{ isDarkMode ? 'Switch to light mode' : 'Switch to dark mode' }}">
+  <div class="toggle-icon-container">
+    <i class="bi bi-sun-fill sun-icon" [class.active]="!isDarkMode"></i>
+    <i class="bi bi-moon-fill moon-icon" [class.active]="isDarkMode"></i>
+  </div>
+</button>

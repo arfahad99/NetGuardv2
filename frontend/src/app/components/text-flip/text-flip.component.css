@@ -1,0 +1,75 @@
+.text-flip-container {
+  display: inline-block;
+  position: relative;
+  padding: 0.5rem 1.5rem;
+  border-radius: 12px;
+  background: linear-gradient(to bottom, #2f3342, #1e2235);
+  box-shadow: 
+    inset 0 -1px rgba(102, 126, 234, 0.3),
+    inset 0 0 0 1px rgba(102, 126, 234, 0.24),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.text-flip-word {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 150px;
+}
+
+.text-flip-letter {
+  display: inline-block;
+  animation: letterFadeIn 0.7s ease forwards;
+  opacity: 0;
+  filter: blur(10px);
+}
+
+@keyframes letterFadeIn {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .text-flip-word {
+    font-size: 1.5rem;
+    min-width: 100px;
+  }
+  
+  .text-flip-container {
+    padding: 0.4rem 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .text-flip-word {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .text-flip-word {
+    font-size: 3rem;
+  }
+}
+
+/* Hover effect */
+.text-flip-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 -1px rgba(102, 126, 234, 0.5),
+    inset 0 0 0 1px rgba(102, 126, 234, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}

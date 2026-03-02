@@ -1,0 +1,137 @@
+<div class="page-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="row align-items-center">
+    <div class="col">
+      <h2 class="mb-1 fw-bold"><i class="bi bi-speedometer2 me-2"></i>QoS Events</h2>
+      <p class="mb-0 opacity-75">Quality of Service monitoring</p>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-light rounded-pill px-4" (click)="openModal()" *ngIf="auth.canEdit()"><i class="bi bi-plus-lg me-2"></i>Add Event</button>
+      <div *ngIf="auth.isGuest()" class="alert alert-info mb-0 py-2 px-3"><i class="bi bi-info-circle me-2"></i><small>Guest users have read-only access</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-8">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control form-control-dark" placeholder="Search by user or app type..." [(ngModel)]="searchTerm" (input)="filterEvents()">
+    </div>
+  </div>
+  <div class="col-md-4">
+    <select class="form-select form-control-dark" [(ngModel)]="filterQuality" (change)="filterEvents()">
+      <option value="">All Quality</option>
+      <option value="Excellent">Excellent</option>
+      <option value="Good">Good</option>
+      <option value="Fair">Fair</option>
+      <option value="Poor">Poor</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-dark-custom mb-0">
+      <thead><tr><th>User</th><th>App Type</th><th>Signal</th><th>Latency</th><th>Bandwidth</th><th>Quality</th><th>Actions</th></tr></thead>
+      <tbody>
+        @if (loading) {
+          <tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+        } @else if (filteredEvents.length === 0) {
+          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-speedometer"></i><p>No events found</p></div></td></tr>
+        } @else {
+          @for (event of filteredEvents; track event._id) {
+            <tr>
+              <td><div class="fw-semibold">{{ event.User_ID }}</div></td>
+              <td><span class="badge bg-info rounded-pill">{{ event.Application_Type }}</span></td>
+              <td>{{ event.Signal_Strength?.value_dbm || 0 }} dBm</td>
+              <td>{{ event.Latency?.avg_ms || 0 }} ms</td>
+              <td>{{ event.Allocated_Bandwidth?.mbps || 0 }} Mbps</td>
+              <td><span [class]="'badge-status badge-' + getQualityClass(event.Signal_Strength?.quality)">{{ event.Signal_Strength?.quality || 'N/A' }}</span></td>
+              <td>
+                <button class="action-btn view me-1" (click)="viewEvent(event)" title="View"><i class="bi bi-eye"></i></button>
+                <button class="action-btn edit me-1" (click)="editEvent(event)" *ngIf="auth.canEdit()" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="action-btn delete" (click)="deleteEvent(event._id)" *ngIf="auth.canDelete()" title="Delete"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+  <span class="text-secondary">Showing {{ filteredEvents.length }} events</span>
+  <div>
+    <button class="btn btn-outline-light rounded-pill me-2" [disabled]="currentPage === 1" (click)="changePage(-1)"><i class="bi bi-chevron-left"></i> Previous</button>
+    <button class="btn btn-outline-light rounded-pill" (click)="changePage(1)">Next <i class="bi bi-chevron-right"></i></button>
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal d-block" style="background: rgba(0,0,0,0.7);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content modal-dark">
+        <div class="modal-header border-bottom" style="border-color: var(--border-color) !important;">
+          <h5 class="modal-title">{{ isEditing ? 'Edit Event' : (isViewing ? 'Event Details' : 'Add Event') }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          @if (isViewing) {
+            <div class="row g-3">
+              <div class="col-6"><label class="text-secondary">User ID</label><p class="fw-semibold">{{ selectedEvent?.User_ID }}</p></div>
+              <div class="col-6"><label class="text-secondary">App Type</label><p class="fw-semibold">{{ selectedEvent?.Application_Type }}</p></div>
+              <div class="col-4"><label class="text-secondary">Signal</label><p class="fw-semibold">{{ selectedEvent?.Signal_Strength?.value_dbm }} dBm</p></div>
+              <div class="col-4"><label class="text-secondary">Latency</label><p class="fw-semibold">{{ selectedEvent?.Latency?.avg_ms }} ms</p></div>
+              <div class="col-4"><label class="text-secondary">Quality</label><p class="fw-semibold">{{ selectedEvent?.Signal_Strength?.quality }}</p></div>
+            </div>
+          } @else {
+            <form>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label text-secondary">User ID *</label>
+                  <input type="text" class="form-control form-control-dark" [(ngModel)]="form.user_id" name="user_id">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-secondary">Application Type *</label>
+                  <select class="form-select form-control-dark" [(ngModel)]="form.application_type" name="application_type">
+                    <option value="video_streaming">Video Streaming</option>
+                    <option value="voip">VoIP</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="web_browsing">Web Browsing</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Signal (dBm)</label>
+                  <input type="number" class="form-control form-control-dark" [(ngModel)]="form.signal_value_dbm" name="signal_value_dbm">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Latency (ms)</label>
+                  <input type="number" class="form-control form-control-dark" [(ngModel)]="form.latency_avg_ms" name="latency_avg_ms">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-secondary">Quality</label>
+                  <select class="form-select form-control-dark" [(ngModel)]="form.signal_quality" name="signal_quality">
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                    <option value="Poor">Poor</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          }
+        </div>
+        <div class="modal-footer border-top" style="border-color: var(--border-color) !important;">
+          <button type="button" class="btn btn-outline-light rounded-pill" (click)="closeModal()">{{ isViewing ? 'Close' : 'Cancel' }}</button>
+          @if (!isViewing) {
+            <button type="button" class="btn btn-gradient" (click)="saveEvent()" [disabled]="saving">
+              @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+              {{ isEditing ? 'Update' : 'Create' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,38 @@
+<div 
+  #parent
+  [class]="'background-beams-container ' + className">
+  
+  <!-- Beams -->
+  @for (state of beamStates; track trackByIndex($index)) {
+    <div 
+      [id]="'beam-' + $index"
+      [class]="'beam ' + (state.beam.className || '')"
+      [ngStyle]="getBeamStyle(state)"
+      [class.animating]="state.animating">
+    </div>
+    
+    <!-- Explosion Effect -->
+    @if (state.collision.detected && state.collision.coordinates) {
+      <div 
+        class="explosion"
+        [ngStyle]="getExplosionStyle(state.collision.coordinates)">
+        <div class="explosion-line"></div>
+        @for (direction of particleDirections; track $index) {
+          <span 
+            class="explosion-particle"
+            [style.--direction-x]="direction.x"
+            [style.--direction-y]="direction.y">
+          </span>
+        }
+      </div>
+    }
+  }
+  
+  <!-- Content -->
+  <div class="content-wrapper">
+    <ng-content></ng-content>
+  </div>
+  
+  <!-- Bottom Container -->
+  <div #container class="bottom-container"></div>
+</div>

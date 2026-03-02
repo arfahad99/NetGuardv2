@@ -1,0 +1,11 @@
+<div class="text-flip-container">
+  <div class="text-flip-word" [attr.data-word]="currentWord">
+    <span 
+      *ngFor="let letter of letters; let i = index" 
+      class="text-flip-letter"
+      [style.animation-delay]="getLetterDelay(i)"
+    >
+      {{ letter }}
+    </span>
+  </div>
+</div>

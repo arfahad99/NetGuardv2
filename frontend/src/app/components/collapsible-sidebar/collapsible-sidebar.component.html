@@ -1,0 +1,107 @@
+<!-- Sidebar Container -->
+<aside 
+  class="collapsible-sidebar"
+  [class.expanded]="isExpanded && !isMobile"
+  [class.mobile-open]="showMobileMenu && isMobile"
+  [class.mobile]="isMobile"
+  [attr.aria-hidden]="isMobile && !showMobileMenu">
+  
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <!-- Burger Menu Button -->
+    <button 
+      class="burger-menu-btn"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="isMobile ? (showMobileMenu ? 'Close navigation menu' : 'Open navigation menu') : (isExpanded ? 'Collapse sidebar' : 'Expand sidebar')"
+      [attr.aria-expanded]="isMobile ? showMobileMenu : isExpanded"
+      type="button"
+      role="button">
+      <div class="burger-icon" [class.active]="isMobile ? showMobileMenu : isExpanded">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+      </div>
+    </button>
+
+    <div class="brand" [class.collapsed]="!isExpanded && !isMobile">
+      <i class="bi bi-router-fill brand-icon"></i>
+      <span class="brand-text" *ngIf="isExpanded || isMobile">NetworkPro</span>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+    <ul class="nav-list">
+      <li *ngFor="let item of navigationItems; trackBy: trackByNavItem" class="nav-item">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-link"
+          (click)="navigateAndClose(item.route)"
+          [attr.aria-label]="item.label"
+          [title]="!isExpanded && !isMobile ? item.label : ''">
+          <i class="nav-icon bi" [class]="item.icon"></i>
+          <span class="nav-text" *ngIf="isExpanded || isMobile">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <!-- Theme Toggle -->
+    <button 
+      class="theme-toggle-btn"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+      [title]="!isExpanded && !isMobile ? (isDarkMode ? 'Light mode' : 'Dark mode') : ''">
+      <i class="bi" [class.bi-sun-fill]="!isDarkMode" [class.bi-moon-stars-fill]="isDarkMode"></i>
+      <span class="theme-text" *ngIf="isExpanded || isMobile">
+        {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+      </span>
+    </button>
+
+    <!-- User Info Section -->
+    <div class="user-info" [class.collapsed]="!isExpanded && !isMobile">
+      <button 
+        class="user-toggle"
+        (click)="toggleUserDropdown()"
+        [attr.aria-expanded]="isUserDropdownOpen"
+        [attr.aria-label]="'User menu for ' + getUsername()">
+        
+        <div class="user-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        
+        <div class="user-details" *ngIf="isExpanded || isMobile">
+          <div class="user-name">{{ getUsername() }}</div>
+          <div class="user-role" [class]="'role-' + authService.getRole().toLowerCase()">
+            {{ getRoleDisplay() }}
+          </div>
+        </div>
+        
+        <i class="bi bi-chevron-up dropdown-arrow" 
+           [class.rotated]="!isUserDropdownOpen"
+           *ngIf="isExpanded || isMobile"></i>
+      </button>
+
+      <!-- User Dropdown -->
+      <div class="user-dropdown" 
+           [class.open]="isUserDropdownOpen"
+           [attr.aria-hidden]="!isUserDropdownOpen">
+        <button class="dropdown-btn sign-out-btn" (click)="signOut()">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile Backdrop -->
+<div 
+  *ngIf="isMobile && showMobileMenu"
+  class="mobile-backdrop"
+  (click)="closeSidebar()"
+  aria-hidden="true">
+</div>

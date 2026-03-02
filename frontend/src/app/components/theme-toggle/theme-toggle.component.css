@@ -1,0 +1,72 @@
+.theme-toggle-btn {
+  position: relative;
+  width: 56px;
+  height: 32px;
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.toggle-icon-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sun-icon,
+.moon-icon {
+  position: absolute;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: scale(0.5) rotate(180deg);
+}
+
+.sun-icon.active {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: #f59e0b;
+}
+
+.moon-icon.active {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: #6366f1;
+}
+
+.theme-toggle-btn::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.theme-toggle-btn:not(.dark-mode)::before {
+  transform: translateX(20px);
+}
+
+/* Dark mode styles */
+body.dark-mode .theme-toggle-btn::before {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+body.light-mode .theme-toggle-btn::before {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}

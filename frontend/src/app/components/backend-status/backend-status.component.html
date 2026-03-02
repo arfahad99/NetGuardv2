@@ -1,0 +1,56 @@
+<!-- Backend Status Overlay -->
+<div *ngIf="!isBackendAvailable" class="backend-status-overlay">
+  <div class="backend-status-modal">
+    <div class="status-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    
+    <h2 class="status-title">Backend Server Not Available</h2>
+    
+    <p class="status-message">
+      The application requires a connection to the backend server to function properly.
+      Please ensure the backend server is running.
+    </p>
+    
+    <div class="status-details">
+      <div class="detail-item">
+        <i class="bi bi-server"></i>
+        <span>Expected Server: <code>{{ serverUrl }}</code></span>
+      </div>
+      
+      <div class="detail-item">
+        <i class="bi bi-clock"></i>
+        <span>Last Check: {{ lastCheckTime | date:'medium' }}</span>
+      </div>
+    </div>
+    
+    <div class="status-actions">
+      <button class="btn btn-primary" (click)="retryConnection()" [disabled]="isRetrying">
+        <i class="bi bi-arrow-clockwise" [class.spin]="isRetrying"></i>
+        {{ isRetrying ? 'Checking...' : 'Retry Connection' }}
+      </button>
+      
+      <button class="btn btn-outline-secondary" (click)="showInstructions = !showInstructions">
+        <i class="bi bi-question-circle"></i>
+        {{ showInstructions ? 'Hide' : 'Show' }} Instructions
+      </button>
+    </div>
+    
+    <!-- Instructions -->
+    <div *ngIf="showInstructions" class="instructions">
+      <h4>How to start the backend server:</h4>
+      <ol>
+        <li>Navigate to the backend directory</li>
+        <li>Install dependencies: <code>pip install -r requirements.txt</code></li>
+        <li>Start the server: <code>python app.py</code></li>
+        <li>Ensure it's running on: <code>{{ serverUrl }}</code></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- Status Indicator (when backend is available) -->
+<div *ngIf="isBackendAvailable" class="backend-status-indicator online">
+  <i class="bi bi-check-circle-fill"></i>
+  <span>Backend Connected</span>
+</div>

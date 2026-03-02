@@ -1,0 +1,88 @@
+/* Sessions specific styles */
+.page-header {
+  background: var(--warning-gradient) !important;
+}
+
+.page-header .text-dark {
+  color: #000 !important;
+}
+
+.page-header .opacity-75.text-dark {
+  color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Peak hour badge styles */
+.badge-status.badge-warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.badge-status.badge-online {
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+}
+
+/* Session ID styling */
+.fw-semibold {
+  font-weight: 600;
+}
+
+/* User badge styling */
+.badge.bg-secondary {
+  background: rgba(108, 117, 125, 0.2) !important;
+  color: #6c757d !important;
+}
+
+/* Warning gradient button */
+.btn-gradient[style*="warning-gradient"] {
+  background: var(--warning-gradient) !important;
+  border: none;
+  color: #000 !important;
+}
+
+.btn-gradient[style*="warning-gradient"]:hover {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  color: #000 !important;
+}
+
+/* Modal customizations */
+.modal-dark {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* Light mode adjustments */
+body.light-mode .page-header {
+  color: #000 !important;
+}
+
+body.light-mode .page-header .text-dark {
+  color: #000 !important;
+}
+
+body.light-mode .page-header .opacity-75.text-dark {
+  color: rgba(0, 0, 0, 0.75) !important;
+}
+
+body.light-mode .modal-dark {
+  background: #ffffff;
+  color: #333;
+}
+
+body.light-mode .modal-header,
+body.light-mode .modal-footer {
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .badge.bg-secondary {
+  background: rgba(108, 117, 125, 0.15) !important;
+  color: #495057 !important;
+}

@@ -1,0 +1,223 @@
+  <div class="page-header">
+    <div class="row align-items-center">
+      <div class="col">
+        <h2 class="mb-1 fw-bold"><i class="bi bi-pc-display me-2"></i>Devices</h2>
+        <p class="mb-0 opacity-75">Manage network devices</p>
+      </div>
+      <div class="col-auto">
+        <button *ngIf="auth.canCreate()" class="btn btn-light rounded-pill px-4" (click)="openModal()">
+          <i class="bi bi-plus-lg me-2"></i>Add Device
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="form-control form-control-dark" placeholder="Search devices..." [(ngModel)]="searchTerm" (input)="filterDevices()">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-control-dark" [(ngModel)]="filterStatus" (change)="filterDevices()">
+        <option value="">All Status</option>
+        <option value="online">Online</option>
+        <option value="offline">Offline</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-control-dark" [(ngModel)]="filterType" (change)="filterDevices()">
+        <option value="">All Types</option>
+        <option value="router">Router</option>
+        <option value="switch">Switch</option>
+        <option value="server">Server</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="card d-none d-md-block">
+    <div class="table-responsive">
+      <table class="table table-dark-custom mb-0">
+        <thead>
+          <tr><th>Device</th><th>Type</th><th>IP Address</th><th>Status</th><th>OS</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+          } @else if (filteredDevices.length === 0) {
+            <tr><td colspan="6"><div class="empty-state"><i class="bi bi-pc-display-horizontal"></i><p>No devices found</p></div></td></tr>
+          } @else {
+            @for (device of filteredDevices; track device._id) {
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon primary me-3" style="width: 40px; height: 40px; font-size: 0.9rem;"><i class="bi bi-hdd-network"></i></div>
+                    <div><div class="fw-semibold">{{ device.name }}</div><small class="text-secondary">{{ device.system?.owner?.department || 'N/A' }}</small></div>
+                  </div>
+                </td>
+                <td><span class="badge bg-secondary rounded-pill">{{ device.type }}</span></td>
+                <td>{{ device.network?.primary_ip || 'N/A' }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="pulse-dot me-2" [class.online]="device.status?.state === 'online'" [class.offline]="device.status?.state !== 'online'"></span>
+                    <span [class]="'badge-status badge-' + (device.status?.state === 'online' ? 'online' : 'offline')">{{ device.status?.state || 'unknown' }}</span>
+                  </div>
+                </td>
+                <td>{{ device.system?.os || 'N/A' }}</td>
+                <td>
+                  <button class="action-btn view me-1" (click)="viewDevice(device)"><i class="bi bi-eye"></i></button>
+                  <button *ngIf="auth.canEdit()" class="action-btn edit me-1" (click)="editDevice(device)"><i class="bi bi-pencil"></i></button>
+                  <button *ngIf="auth.canDelete()" class="action-btn delete" (click)="deleteDevice(device._id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile Card View -->
+  <div class="d-md-none">
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+    } @else if (filteredDevices.length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-pc-display-horizontal"></i>
+        <p>No devices found</p>
+      </div>
+    } @else {
+      @for (device of filteredDevices; track device._id) {
+        <div class="mobile-device-card">
+          <div class="mobile-device-header">
+            <div class="d-flex align-items-center">
+              <div class="stat-icon primary me-3">
+                <i class="bi bi-hdd-network"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-1 fw-semibold">{{ device.name }}</h6>
+                <small class="text-secondary">{{ device.system?.owner?.department || 'N/A' }}</small>
+              </div>
+              <div class="mobile-actions">
+                <button class="action-btn view me-1" (click)="viewDevice(device)" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button *ngIf="auth.canEdit()" class="action-btn edit me-1" (click)="editDevice(device)" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button *ngIf="auth.canDelete()" class="action-btn delete" (click)="deleteDevice(device._id)" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="mobile-device-body">
+            <div class="row g-2">
+              <div class="col-6">
+                <small class="text-secondary d-block">Type</small>
+                <span class="badge bg-secondary rounded-pill">{{ device.type }}</span>
+              </div>
+              <div class="col-6">
+                <small class="text-secondary d-block">Status</small>
+                <div class="d-flex align-items-center">
+                  <span class="pulse-dot me-2" [class.online]="device.status?.state === 'online'" [class.offline]="device.status?.state !== 'online'"></span>
+                  <span [class]="'badge-status badge-' + (device.status?.state === 'online' ? 'online' : 'offline')">{{ device.status?.state || 'unknown' }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <small class="text-secondary d-block">IP Address</small>
+                <span class="fw-medium">{{ device.network?.primary_ip || 'N/A' }}</span>
+              </div>
+              <div class="col-6">
+                <small class="text-secondary d-block">OS</small>
+                <span class="fw-medium">{{ device.system?.os || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <span class="text-secondary">Showing {{ filteredDevices.length }} devices</span>
+    <div>
+      <button class="btn btn-outline-light rounded-pill me-2" [disabled]="currentPage === 1" (click)="changePage(-1)"><i class="bi bi-chevron-left"></i> Previous</button>
+      <button class="btn btn-outline-light rounded-pill" (click)="changePage(1)">Next <i class="bi bi-chevron-right"></i></button>
+    </div>
+  </div>
+
+  @if (showModal) {
+    <div class="modal d-block" style="background: rgba(0,0,0,0.7);">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-dark">
+          <div class="modal-header border-bottom" style="border-color: var(--border-color) !important;">
+            <h5 class="modal-title">{{ isEditing ? 'Edit Device' : (isViewing ? 'Device Details' : 'Add Device') }}</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            @if (isViewing) {
+              <div class="row g-3">
+                <div class="col-6"><label class="text-secondary">Name</label><p class="fw-semibold">{{ selectedDevice?.name }}</p></div>
+                <div class="col-6"><label class="text-secondary">Type</label><p class="fw-semibold">{{ selectedDevice?.type }}</p></div>
+                <div class="col-6"><label class="text-secondary">Primary IP</label><p class="fw-semibold">{{ selectedDevice?.network?.primary_ip }}</p></div>
+                <div class="col-6"><label class="text-secondary">Status</label><p class="fw-semibold">{{ selectedDevice?.status?.state }}</p></div>
+                <div class="col-6"><label class="text-secondary">OS</label><p class="fw-semibold">{{ selectedDevice?.system?.os }}</p></div>
+                <div class="col-6"><label class="text-secondary">Department</label><p class="fw-semibold">{{ selectedDevice?.system?.owner?.department }}</p></div>
+              </div>
+            } @else {
+              <form>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Name *</label>
+                    <input type="text" class="form-control form-control-dark" [(ngModel)]="form.name" name="name" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Type *</label>
+                    <select class="form-select form-control-dark" [(ngModel)]="form.type" name="type">
+                      <option value="router">Router</option>
+                      <option value="switch">Switch</option>
+                      <option value="server">Server</option>
+                      <option value="workstation">Workstation</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Primary IP</label>
+                    <input type="text" class="form-control form-control-dark" [(ngModel)]="form.primary_ip" name="primary_ip">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Status</label>
+                    <select class="form-select form-control-dark" [(ngModel)]="form.status_state" name="status_state">
+                      <option value="online">Online</option>
+                      <option value="offline">Offline</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Operating System</label>
+                    <input type="text" class="form-control form-control-dark" [(ngModel)]="form.os" name="os">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary">Department</label>
+                    <input type="text" class="form-control form-control-dark" [(ngModel)]="form.department" name="department">
+                  </div>
+                </div>
+              </form>
+            }
+          </div>
+          <div class="modal-footer border-top" style="border-color: var(--border-color) !important;">
+            <button type="button" class="btn btn-outline-light rounded-pill" (click)="closeModal()">{{ isViewing ? 'Close' : 'Cancel' }}</button>
+            @if (!isViewing) {
+              <button type="button" class="btn btn-gradient" (click)="saveDevice()" [disabled]="saving">
+                @if (saving) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                {{ isEditing ? 'Update' : 'Create' }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }

@@ -1,0 +1,140 @@
+<!-- Welcome Header -->
+<div class="welcome-header">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col">
+        <h1 class="welcome-title">Welcome back, {{ username }}! 👋</h1>
+        <p class="welcome-subtitle">Ready to monitor your network performance?</p>
+      </div>
+      <div class="col-auto">
+        <button routerLink="/dashboard" class="btn btn-gradient">
+          <i class="bi bi-grid-1x2-fill me-2"></i>
+          Go to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Background Beams Hero -->
+<div class="container-fluid">
+  <app-background-beams className="network-theme">
+    <div class="network-hero">
+      <i class="bi bi-hdd-network-fill hero-icon"></i>
+      
+      <h1 class="demo-title">Network Performance</h1>
+      
+      <div class="gradient-text-wrapper">
+        <h2 class="gradient-text">Monitoring Made Simple</h2>
+      </div>
+      
+      <p class="hero-subtitle">
+        Real-time insights • Instant alerts • Complete visibility
+      </p>
+      
+      <div class="hero-stats">
+        <div class="stat-badge">
+          <i class="bi bi-lightning-charge-fill"></i>
+          <span>Fast</span>
+        </div>
+        <div class="stat-badge">
+          <i class="bi bi-shield-fill-check"></i>
+          <span>Secure</span>
+        </div>
+        <div class="stat-badge">
+          <i class="bi bi-graph-up-arrow"></i>
+          <span>Easy</span>
+        </div>
+      </div>
+    </div>
+  </app-background-beams>
+</div>
+
+<!-- Quick Actions -->
+<div class="container-fluid mt-4">
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <a routerLink="/dashboard" class="quick-action-card">
+        <div class="action-icon primary">
+          <i class="bi bi-grid-1x2-fill"></i>
+        </div>
+        <h3>Dashboard</h3>
+        <p>View your network overview and statistics</p>
+        <span class="action-arrow"><i class="bi bi-arrow-right"></i></span>
+      </a>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+      <a routerLink="/devices" class="quick-action-card">
+        <div class="action-icon success">
+          <i class="bi bi-pc-display"></i>
+        </div>
+        <h3>Devices</h3>
+        <p>Manage and monitor all your devices</p>
+        <span class="action-arrow"><i class="bi bi-arrow-right"></i></span>
+      </a>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+      <a routerLink="/alerts" class="quick-action-card">
+        <div class="action-icon danger">
+          <i class="bi bi-bell-fill"></i>
+        </div>
+        <h3>Alerts</h3>
+        <p>Check active alerts and notifications</p>
+        <span class="action-arrow"><i class="bi bi-arrow-right"></i></span>
+      </a>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+      <a routerLink="/network-health" class="quick-action-card">
+        <div class="action-icon warning">
+          <i class="bi bi-heart-pulse-fill"></i>
+        </div>
+        <h3>Network Health</h3>
+        <p>Monitor your network health status</p>
+        <span class="action-arrow"><i class="bi bi-arrow-right"></i></span>
+      </a>
+    </div>
+  </div>
+  
+
+</div>
+
+<!-- Features Section -->
+<div class="container-fluid mt-5">
+  <div class="features-section">
+    <h2 class="text-center mb-4">What You Can Do</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-lightning-fill"></i>
+          </div>
+          <h4>Real-time Monitoring</h4>
+          <p>Track your network performance in real-time with instant updates and live data visualization.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-bell-fill"></i>
+          </div>
+          <h4>Instant Alerts</h4>
+          <p>Get notified immediately when issues arise so you can take action before they impact your network.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h4>Performance Analytics</h4>
+          <p>Analyze trends and patterns to optimize your network performance and prevent future issues.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

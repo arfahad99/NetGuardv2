@@ -1,0 +1,44 @@
+name: Deploy NetGuard to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  # Triggers the pipeline when you push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Navigate to the project directory (assuming you cloned it here during initial setup)
+            cd ~/NetGuardV2
+            
+            # Pull the latest code from GitHub
+            git pull origin main
+            
+            # --- Update Backend ---
+            cd backend
+            pip3 install -r requirements.txt
+            
+            # Restart backend using PM2 (a process manager that keeps your app running)
+            # If backend isn't running yet in pm2, it will start it.
+            pm2 restart backend || pm2 start app.py --name "backend" --interpreter python3
+            
+            # --- Update Frontend ---
+            cd ../frontend
+            npm install
+            
+            # Restart frontend using PM2
+            pm2 restart frontend || pm2 start "npx @angular/cli serve --host 0.0.0.0 --port 4200 --disable-host-check" --name "frontend"
+            
+            echo "Deployment Successful!"

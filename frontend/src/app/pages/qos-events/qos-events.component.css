@@ -1,0 +1,64 @@
+/* QoS Events specific styles */
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Quality badge styles */
+.badge-status.badge-online {
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+}
+
+.badge-status.badge-active {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+}
+
+.badge-status.badge-warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.badge-status.badge-offline {
+  background: rgba(244, 92, 67, 0.2);
+  color: #f45c43;
+}
+
+/* Application type badges */
+.badge.bg-info {
+  background: rgba(102, 126, 234, 0.2) !important;
+  color: #667eea !important;
+}
+
+/* Modal customizations */
+.modal-dark {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* Light mode adjustments */
+body.light-mode .page-header {
+  color: white !important;
+}
+
+body.light-mode .page-header .opacity-75 {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.light-mode .modal-dark {
+  background: #ffffff;
+  color: #333;
+}
+
+body.light-mode .modal-header,
+body.light-mode .modal-footer {
+  border-color: #e2e8f0 !important;
+}

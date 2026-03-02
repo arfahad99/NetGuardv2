@@ -1,0 +1,38 @@
+@switch (status) {
+  @case ('online') {
+    <span [class]="badgeClasses" [title]="label || 'Online'">
+      <i class="bi bi-check-circle-fill me-1"></i>
+      <span class="badge-text">{{ label || 'Online' }}</span>
+    </span>
+  }
+  @case ('offline') {
+    <span [class]="badgeClasses" [title]="label || 'Offline'">
+      <i class="bi bi-x-circle-fill me-1"></i>
+      <span class="badge-text">{{ label || 'Offline' }}</span>
+    </span>
+  }
+  @case ('warning') {
+    <span [class]="badgeClasses" [title]="label || 'Warning'">
+      <i class="bi bi-exclamation-triangle-fill me-1"></i>
+      <span class="badge-text">{{ label || 'Warning' }}</span>
+    </span>
+  }
+  @case ('active') {
+    <span [class]="badgeClasses" [title]="label || 'Active'">
+      <i class="bi bi-activity me-1"></i>
+      <span class="badge-text">{{ label || 'Active' }}</span>
+    </span>
+  }
+  @case ('critical') {
+    <span [class]="badgeClasses" [title]="label || 'Critical'">
+      <i class="bi bi-exclamation-octagon-fill me-1"></i>
+      <span class="badge-text">{{ label || 'Critical' }}</span>
+    </span>
+  }
+  @default {
+    <span [class]="badgeClasses" [title]="label || 'Unknown'">
+      <i class="bi bi-question-circle-fill me-1"></i>
+      <span class="badge-text">{{ label || 'Unknown' }}</span>
+    </span>
+  }
+}
