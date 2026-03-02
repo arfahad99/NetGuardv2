@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://127.0.0.1:5001',
+  apiUrl: 'http://98.92.60.94:5001',
   probeApiKey: 'arfahad@99'
 };

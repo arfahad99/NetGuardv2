@@ -15,16 +15,9 @@ app = Flask(__name__)
 # Enable CORS for Angular frontend (allow common development ports)
 CORS(
     app,
-    resources={r"/*": {"origins": [
-        "http://localhost:4200",
-        "http://127.0.0.1:4200",
-        "http://localhost:50507",
-        "http://127.0.0.1:50507",
-        "http://localhost:*",
-        "http://127.0.0.1:*"
-    ]}},
-    supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization", "x-access-token"],
+    resources={r"/*": {"origins": "*"}},
+    supports_credentials=False,
+    allow_headers=["Content-Type", "Authorization", "x-access-token", "x-api-key"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
 
