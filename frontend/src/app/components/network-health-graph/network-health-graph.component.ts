@@ -55,7 +55,7 @@ interface GraphPoint {
 })
 export class NetworkHealthGraphComponent implements OnInit, OnChanges {
   /** Array of network health data to display */
-  @Input() data: NetworkHealthData[] = [];
+  @Input() data: any[] = [];
 
   /** Type of metric to display */
   @Input() metric: 'bandwidth' | 'latency' | 'packet_loss' | 'uptime' = 'bandwidth';
