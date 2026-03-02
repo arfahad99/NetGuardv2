@@ -16,8 +16,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .backend-status-modal {
@@ -40,6 +45,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -57,8 +63,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .status-title {
@@ -170,8 +183,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .instructions {
@@ -233,8 +251,15 @@
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .backend-status-indicator.online {
@@ -246,6 +271,18 @@
 .backend-status-indicator.online i {
   color: #10b981;
   font-size: 1rem;
+}
+
+.backend-status-indicator.offline {
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  background: linear-gradient(135deg, var(--card-bg), rgba(245, 158, 11, 0.05));
+}
+
+.backend-status-indicator.offline i {
+  color: #f59e0b;
+  font-size: 1rem;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* Responsive */

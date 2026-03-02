@@ -7,29 +7,29 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-collapsible-sidebar',
-    standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive],
-    templateUrl: './collapsible-sidebar.component.html',
-    styleUrls: ['./collapsible-sidebar.component.css']
+  selector: 'app-collapsible-sidebar',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
+  templateUrl: './collapsible-sidebar.component.html',
+  styleUrls: ['./collapsible-sidebar.component.css']
 })
 export class CollapsibleSidebarComponent implements OnInit, OnDestroy, OnChanges {
   @Output() sidebarToggle = new EventEmitter<boolean>();
   @Input() externalToggle = false;
-  
+
   isExpanded = false;
   isMobile = false;
   showMobileMenu = false;
   isDarkMode = true;
   isUserDropdownOpen = false;
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
     public authService: AuthService,
     private themeService: ThemeService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Subscribe to theme changes
@@ -60,7 +60,7 @@ export class CollapsibleSidebarComponent implements OnInit, OnDestroy, OnChanges
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    
+
     // Remove event listener
     window.removeEventListener('mobileMenuToggle', this.handleMobileMenuToggle.bind(this));
   }
@@ -73,12 +73,12 @@ export class CollapsibleSidebarComponent implements OnInit, OnDestroy, OnChanges
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
-    
+
     // Close user dropdown if clicking outside
     if (!target.closest('.user-info') && this.isUserDropdownOpen) {
       this.isUserDropdownOpen = false;
     }
-    
+
     // Close mobile menu if clicking outside
     if (this.isMobile && this.showMobileMenu && !target.closest('.collapsible-sidebar') && !target.closest('.mobile-menu-btn')) {
       this.showMobileMenu = false;
@@ -146,7 +146,8 @@ export class CollapsibleSidebarComponent implements OnInit, OnDestroy, OnChanges
       { route: '/alerts', icon: 'bi-bell-fill', label: 'Alerts' },
       { route: '/network-health', icon: 'bi-heart-pulse-fill', label: 'Network Health' },
       { route: '/qos-events', icon: 'bi-speedometer2', label: 'QoS Events' },
-      { route: '/sessions', icon: 'bi-clock-history', label: 'Sessions' }
+      { route: '/sessions', icon: 'bi-clock-history', label: 'Sessions' },
+      { route: '/cloud-health', icon: 'bi-cloud-check-fill', label: 'Cloud Health' }
     ];
 
     // Add admin-only items

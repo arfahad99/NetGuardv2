@@ -1,39 +1,5 @@
-<!-- Cloud Connection Status Overlay (when disconnected) -->
-<div *ngIf="!isBackendAvailable" class="backend-status-overlay">
-  <div class="backend-status-modal">
-    <div class="status-icon warning">
-      <i class="bi bi-cloud-slash-fill"></i>
-    </div>
-
-    <h2 class="status-title">Cloud Server Unreachable</h2>
-
-    <p class="status-message">
-      Unable to reach the cloud backend. The server may be starting up or temporarily unavailable.
-    </p>
-
-    <div class="status-details">
-      <div class="detail-item">
-        <i class="bi bi-cloud"></i>
-        <span>Cloud Server: <code>{{ serverUrl }}</code></span>
-      </div>
-
-      <div class="detail-item">
-        <i class="bi bi-clock"></i>
-        <span>Last Check: {{ lastCheckTime | date:'medium' }}</span>
-      </div>
-    </div>
-
-    <div class="status-actions">
-      <button class="btn btn-primary" (click)="retryConnection()" [disabled]="isRetrying">
-        <i class="bi bi-arrow-clockwise" [class.spin]="isRetrying"></i>
-        {{ isRetrying ? 'Reconnecting...' : 'Retry Connection' }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Cloud Connected Indicator (when connected) -->
-<div *ngIf="isBackendAvailable" class="backend-status-indicator online">
-  <i class="bi bi-cloud-check-fill"></i>
-  <span>Cloud Connected</span>
+<!-- Cloud Connected Indicator (always visible, non-blocking) -->
+<div class="backend-status-indicator" [class.online]="isBackendAvailable" [class.offline]="!isBackendAvailable">
+  <i [class]="isBackendAvailable ? 'bi bi-cloud-check-fill' : 'bi bi-cloud-slash-fill'"></i>
+  <span>{{ isBackendAvailable ? 'Cloud Connected' : 'Cloud Reconnecting...' }}</span>
 </div>

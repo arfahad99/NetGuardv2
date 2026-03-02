@@ -18,22 +18,22 @@ export const routes: Routes = [
       { path: 'network-health', loadComponent: () => import('./pages/network-health/network-health.component').then(m => m.NetworkHealthComponent) },
       { path: 'qos-events', loadComponent: () => import('./pages/qos-events/qos-events.component').then(m => m.QosEventsComponent) },
       { path: 'sessions', loadComponent: () => import('./pages/sessions/sessions.component').then(m => m.SessionsComponent) },
-      
+      { path: 'cloud-health', loadComponent: () => import('./pages/cloud-health/cloud-health.component').then(m => m.CloudHealthComponent) },
 
-      
+
       // User Management (Admin only)
-      { 
-        path: 'manage-users', 
+      {
+        path: 'manage-users',
         loadComponent: () => import('./pages/user-management/user-list.component').then(m => m.UserListComponent),
         canActivate: [adminGuard]
       },
-      { 
-        path: 'manage-users/new', 
+      {
+        path: 'manage-users/new',
         loadComponent: () => import('./pages/user-management/user-create.component').then(m => m.UserCreateComponent),
         canActivate: [adminGuard]
       },
-      { 
-        path: 'manage-users/:id', 
+      {
+        path: 'manage-users/:id',
         loadComponent: () => import('./pages/user-management/user-edit.component').then(m => m.UserEditComponent),
         canActivate: [adminGuard]
       }

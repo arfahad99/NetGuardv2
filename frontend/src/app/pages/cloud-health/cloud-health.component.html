@@ -1,0 +1,67 @@
+<div class="cloud-health-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-icon" [class]="overallStatus">
+                <i [class]="'bi ' + getOverallIcon()"></i>
+            </div>
+            <div class="header-text">
+                <h1>Cloud Health</h1>
+                <p class="subtitle">Real-time infrastructure monitoring</p>
+            </div>
+        </div>
+        <button class="refresh-btn" (click)="refreshAll()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+    </div>
+
+    <!-- Overall Status Banner -->
+    <div class="status-banner" [class]="overallStatus">
+        <div class="banner-content">
+            <div class="banner-icon">
+                <i [class]="'bi ' + getOverallIcon()"></i>
+            </div>
+            <div class="banner-info">
+                <h2 *ngIf="overallStatus === 'healthy'">All Systems Operational</h2>
+                <h2 *ngIf="overallStatus === 'degraded'">Partial System Degradation</h2>
+                <h2 *ngIf="overallStatus === 'down'">Systems Unavailable</h2>
+                <p>Session uptime: {{ uptimePercent }}%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="services-grid">
+        <div class="service-card" *ngFor="let service of services" [class]="getStatusClass(service.status)">
+            <div class="service-header">
+                <div class="service-icon">
+                    <i [class]="'bi ' + service.icon"></i>
+                </div>
+                <div class="status-badge" [class]="service.status">
+                    <span class="status-dot"></span>
+                    {{ service.status === 'checking' ? 'Checking' : service.status === 'online' ? 'Online' : 'Offline'
+                    }}
+                </div>
+            </div>
+            <h3 class="service-name">{{ service.name }}</h3>
+            <p class="service-message">{{ service.message }}</p>
+            <div class="service-footer" *ngIf="service.lastChecked">
+                <i class="bi bi-clock"></i>
+                <span>{{ service.lastChecked | date:'shortTime' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+        <div class="info-card">
+            <i class="bi bi-info-circle-fill"></i>
+            <div class="info-content">
+                <h4>About Cloud Health</h4>
+                <p>This page monitors the health of all cloud infrastructure components powering NetGuard.
+                    Services are automatically checked every 30 seconds.</p>
+            </div>
+        </div>
+    </div>
+</div>
