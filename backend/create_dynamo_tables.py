@@ -1,10 +1,20 @@
 import boto3
-import time
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_tables():
-    dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-    
-    tables = [
+    region = os.getenv('AWS_REGION', 'eu-west-1')
+    dynamodb = boto3.client(
+        'dynamodb',
+        region_name=region,
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+    )
+
+    # Standard tables (partition key = id)
+    standard_tables = [
         "NPMDB_Users",
         "NPMDB_Alerts",
         "NPMDB_Devices",
@@ -13,33 +23,49 @@ def create_tables():
         "NPMDB_Sessions",
         "NPMDB_Blacklist"
     ]
-    
-    for table_name in tables:
+
+    for table_name in standard_tables:
         try:
             print(f"Creating table {table_name}...")
-            response = dynamodb.create_table(
+            dynamodb.create_table(
                 TableName=table_name,
                 KeySchema=[
-                    {
-                        'AttributeName': 'id',
-                        'KeyType': 'HASH'  # Partition key
-                    }
+                    {'AttributeName': 'id', 'KeyType': 'HASH'}
                 ],
                 AttributeDefinitions=[
-                    {
-                        'AttributeName': 'id',
-                        'AttributeType': 'S' # String
-                    }
+                    {'AttributeName': 'id', 'AttributeType': 'S'}
                 ],
-                BillingMode='PAY_PER_REQUEST' # Free tier friendly
+                BillingMode='PAY_PER_REQUEST'
             )
-            print(f"Table {table_name} creation initiated.")
+            print(f"  ✓ {table_name} created.")
         except dynamodb.exceptions.ResourceInUseException:
-            print(f"Table {table_name} already exists.")
+            print(f"  ✓ {table_name} already exists.")
         except Exception as e:
-            print(f"Error creating {table_name}: {e}")
+            print(f"  ✗ Error creating {table_name}: {e}")
 
-    print("\nPlease wait a minute for tables to become active.")
+    # Probe measurements table (partition key = deviceId, sort key = timestamp)
+    dynamo_table = os.getenv('DYNAMO_TABLE', 'NetworkMeasurements')
+    try:
+        print(f"Creating table {dynamo_table}...")
+        dynamodb.create_table(
+            TableName=dynamo_table,
+            KeySchema=[
+                {'AttributeName': 'deviceId',  'KeyType': 'HASH'},
+                {'AttributeName': 'timestamp',  'KeyType': 'RANGE'}
+            ],
+            AttributeDefinitions=[
+                {'AttributeName': 'deviceId',  'AttributeType': 'S'},
+                {'AttributeName': 'timestamp', 'AttributeType': 'S'}
+            ],
+            BillingMode='PAY_PER_REQUEST'
+        )
+        print(f"  ✓ {dynamo_table} created.")
+    except dynamodb.exceptions.ResourceInUseException:
+        print(f"  ✓ {dynamo_table} already exists.")
+    except Exception as e:
+        print(f"  ✗ Error creating {dynamo_table}: {e}")
+
+    print("\nAll tables ready! You can now start the backend.")
 
 if __name__ == "__main__":
     create_tables()
