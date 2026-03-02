@@ -105,7 +105,10 @@ def Signin():
         return make_response(jsonify({"Message": "Invalid username"}), 401)
 
     # Compare password using bcrypt
-    if bcrypt.checkpw(bytes(auth.password, "UTF-8"), user["password"]):
+    stored_pw = user["password"]
+    if isinstance(stored_pw, str):
+        stored_pw = stored_pw.encode("utf-8")
+    if bcrypt.checkpw(bytes(auth.password, "UTF-8"), stored_pw):
         # Determine role
         role = "admin" if user.get("admin", False) else user.get("role", "user")
         
