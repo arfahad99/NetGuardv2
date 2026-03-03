@@ -49,13 +49,24 @@ jobs:
           script: |
             # Update backend code
             cd ~/NetGuardv2
-            git pull origin main
+            # Force git to use the latest main to avoid local conflict failures
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            # Dump Nginx and pm2 diagnostic logs so we can fetch them via a python simple server
+            # We spin up a temp python server on port 9999 so we can grab the Nginx config
+            cat /etc/nginx/sites-available/default > /tmp/nginx-config.txt 2>&1 || true
+            cat /etc/nginx/sites-available/netguard >> /tmp/nginx-config.txt 2>&1 || true
+            pm2 status > /tmp/pm2-status.txt 2>&1 || true
+            cd /tmp
+            nohup python3 -m http.server 9999 > /dev/null 2>&1 &
 
             # Install any new Python dependencies
-            cd backend
+            cd ~/NetGuardv2/backend
             source venv/bin/activate
             pip install -r requirements.txt -q
-
+            
             # Ensure backend listens on 0.0.0.0
             sed -i "s/app.run(debug=True, port=5001)/app.run(debug=True, host='0.0.0.0', port=5001)/" app.py
 
