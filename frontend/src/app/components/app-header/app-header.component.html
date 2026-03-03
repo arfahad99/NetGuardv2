@@ -11,8 +11,9 @@
       </div>
     </button>
 
-    <!-- Logo Section -->
-    <div class="header-brand" role="img" aria-label="NetworkPro Management Dashboard">
+    <!-- Logo Section (Clickable Home) -->
+    <a routerLink="/home" class="header-brand text-decoration-none" role="link"
+      aria-label="NetworkPro Management Dashboard Home">
       <div class="brand-logo" [attr.aria-hidden]="true">
         <i class="bi bi-hdd-network-fill"></i>
       </div>
@@ -20,15 +21,10 @@
         <h1 class="brand-title">NetworkPro</h1>
         <span class="brand-subtitle">Management Dashboard</span>
       </div>
-    </div>
+    </a>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" [class.compact]="needsCompactNavigation()" role="navigation" aria-label="Main navigation">
-      <a routerLink="/home" routerLinkActive="active" class="nav-tab" [attr.aria-label]="'Navigate to Home page'"
-        [attr.title]="isSmallScreen ? 'Home' : null" role="tab" [attr.aria-selected]="router.url === '/home'">
-        <i class="bi bi-house-fill"></i>
-        <span>Home</span>
-      </a>
       <a routerLink="/dashboard" routerLinkActive="active" class="nav-tab"
         [attr.aria-label]="'Navigate to Dashboard page'" [attr.title]="isSmallScreen ? 'Dashboard' : null" role="tab"
         [attr.aria-selected]="router.url === '/dashboard'">
