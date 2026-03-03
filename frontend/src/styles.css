@@ -2547,3 +2547,49 @@ router-outlet+* {
     transform: translateY(0);
   }
 }
+
+/* =========================================================================
+   TEXT COLOR OVERRIDES FOR ACCESSIBILITY AND READABILITY
+   ========================================================================= */
+
+/* Dark Mode - brighter text that stands out against dark backgrounds */
+body.dark-mode .text-success {
+  color: #38ef7d !important;
+}
+
+body.dark-mode .text-danger {
+  color: #ff6b6b !important;
+}
+
+body.dark-mode .text-warning {
+  color: #ffd93d !important;
+}
+
+body.dark-mode .text-info {
+  color: #4ea5e0 !important;
+}
+
+body.dark-mode .text-secondary {
+  color: #b8c1d3 !important;
+}
+
+/* Light Mode - darker text that is legible against light backgrounds */
+body.light-mode .text-success {
+  color: #059669 !important;
+}
+
+body.light-mode .text-danger {
+  color: #dc2626 !important;
+}
+
+body.light-mode .text-warning {
+  color: #d97706 !important;
+}
+
+body.light-mode .text-info {
+  color: #0284c7 !important;
+}
+
+body.light-mode .text-secondary {
+  color: #64748b !important;
+}
