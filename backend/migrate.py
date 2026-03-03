@@ -1,3 +1,9 @@
+# --------------------------------------------------------------------------
+# DO I NEED THIS CODE? -> NO, NOT FOR RUNNING THE APP
+# WHY? -> This was a one-off utility script used in the past to migrate 
+# your codebase from using MongoDB (ObjectId) to DynamoDB (String IDs).
+# You don't need to run this during your demo or code walkthrough!
+# --------------------------------------------------------------------------
 import os
 import re
 

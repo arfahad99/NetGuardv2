@@ -1,3 +1,9 @@
+# --------------------------------------------------------------------------
+# DO I NEED THIS CODE? -> ONLY ONCE FOR INITIAL AWS SETUP
+# WHY? -> This script was used to automatically generate the required 
+# database tables in Amazon DynamoDB. You do NOT need to run this script 
+# to start the backend, and the frontend never interacts with it.
+# --------------------------------------------------------------------------
 import boto3
 import os
 from dotenv import load_dotenv

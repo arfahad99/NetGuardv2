@@ -143,12 +143,46 @@ npm test
 
 ---
 
+## ☁️ Deployment & Cloud Operations
+
+NetworkPro is designed for deployment on AWS (Amazon Web Services). The cloud architecture involves an EC2 instance hosting the Python backend and Angular frontend, with DynamoDB handling the database operations.
+
+### Architecture Overview
+- **Frontend App**: Built with Angular 20, served using a web server (e.g., Nginx) or directly deployed to S3/CloudFront.
+- **Backend API**: Flask application running on an EC2 instance (e.g. via Gunicorn/supervisor).
+- **Database Layer**: AWS DynamoDB for highly scalable, flexible NoSQL storage.
+- **Network Probe**: A separate edge device component runs `probe.py` continuously, gathering network metrics (latency, bandwidth, packet loss, uptime) and submitting them securely via an API key to the backend.
+
+### Cloud Automation Scripts
+We include several utility scripts for easy setup and maintenance:
+- `backend/create_dynamo_tables.py`: A one-off script used during actual AWS deployment to initialize all required DynamoDB tables (users, devices, alerts, network_health, qos_events, sessions).
+- `backend/migrate.py`: A utility script used to migrate data if you are transitioning from MongoDB to DynamoDB context.
+- `backend/probe.py`: The network probe script meant to be run continuously on edge devices or EC2 instances to report back to the main dashboard.
+
+### Monitoring & Cloud Health
+The application features a built-in `/health` API endpoint, which is continuously polled by the **Cloud Health** page (`CloudHealthComponent` in Angular). It provides real-time visibility into the status of:
+1. Flask Backend Server
+2. DynamoDB Database connections
+3. Global Network Probe integrations
+4. Angular Frontend connectivity
+
+### Environment Variables
+For the production cloud environment, you must provide `.env` configuration files for your Flask backend detailing:
+- `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`
+- `PROBE_API_KEY` for authenticating probe instances
+- `SECRET_KEY` for JWT encryptions.
+
+---
+
 ## 📁 Project Structure
 
 ```
 npm-dashboard/
 ├── backend/                    # Flask Backend
 │   ├── app.py                 # Main application
+│   ├── build.sh               # Build script
+│   ├── create_dynamo_tables.py# Setup DynamoDB (Cloud)
+│   ├── migrate.py             # Schema migration utility
 │   ├── decorators.py          # JWT & RBAC decorators
 │   ├── globals.py             # Database & config
 │   └── blueprint/             # API blueprints
@@ -160,6 +194,9 @@ npm-dashboard/
 │       ├── qosevent/          # QoS events
 │       └── sessions/          # Session tracking
 │
+├── probe/                      # Network Probe
+│   └── probe.py               # Edge device measurement script
+│
 ├── frontend/                   # Angular Frontend
 │   ├── src/
 │   │   ├── app/
@@ -167,53 +204,13 @@ npm-dashboard/
 │   │   │   │   ├── app-header/            # Main navigation header
 │   │   │   │   ├── app-footer/            # Application footer
 │   │   │   │   ├── backend-status/        # Backend health indicator
-│   │   │   │   ├── theme-toggle/          # Dark/light mode toggle
-│   │   │   │   ├── background-beams/      # Animated background
-│   │   │   │   ├── collapsible-sidebar/   # Navigation sidebar
-│   │   │   │   ├── confirm-dialog/        # Confirmation modals
-│   │   │   │   ├── network-health-graph/  # Animated SVG graphs
-│   │   │   │   ├── stateful-button/       # Loading state buttons
-│   │   │   │   ├── status-badge/          # Status indicators
-│   │   │   │   ├── text-flip/             # Text animations
-│   │   │   │   └── toast/                 # Notifications
-│   │   │   ├── layouts/       # Layout components
-│   │   │   │   └── main-layout/           # Main app layout
-│   │   │   ├── guards/        # Route guards
-│   │   │   │   ├── auth.guard.ts          # Authentication guard
-│   │   │   │   └── admin.guard.ts         # Admin-only guard
-│   │   │   ├── services/      # Services
-│   │   │   │   ├── auth.service.ts        # Authentication
-│   │   │   │   ├── users.service.ts       # User management
-│   │   │   │   ├── api.service.ts         # API integration
-│   │   │   │   ├── toast.service.ts       # Notifications
-│   │   │   │   └── theme.service.ts       # Dark/light mode
+│   │   │   │   └── ...                    # Further components
 │   │   │   ├── pages/         # Page components
-│   │   │   │   ├── Signin/                # Sign in page
-│   │   │   │   ├── signup/                # Sign up page
-│   │   │   │   ├── welcome/               # Welcome dashboard
-│   │   │   │   ├── dashboard/             # Main dashboard
-│   │   │   │   ├── devices/               # Device management
-│   │   │   │   ├── alerts/                # Alert management
-│   │   │   │   ├── network-health/        # Network health
-│   │   │   │   ├── qos-events/            # QoS events
-│   │   │   │   ├── sessions/              # Session tracking
-│   │   │   │   └── user-management/       # User admin
-│   │   │   ├── navigation/    # Navigation component
-│   │   │   ├── home/          # Home component
-│   │   │   ├── directives/    # Custom directives
-│   │   │   │   └── moving-border.directive.ts
-│   │   │   ├── pipes/         # Custom pipes
-│   │   │   │   └── time-ago.pipe.ts
-│   │   │   └── interceptors/  # HTTP interceptors
-│   │   │       └── auth.interceptor.ts
-│   │   └── styles.css         # Global styles
-│   └── angular.json
-│
+│   │   │   │   ├── cloud-health/          # Real-time Cloud Health status
+│   │   │   │   └── ...                    # Further pages
+│   │   └── ...
+│   └── ...
 └── docs/                       # Documentation
-    ├── RBAC_README.md         # RBAC overview
-    ├── RBAC_COMPLETE_GUIDE.md # Comprehensive RBAC guide
-    ├── USER_MANAGEMENT_GUIDE.md
-    └── ...
 ```
 
 ---

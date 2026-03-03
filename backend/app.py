@@ -31,10 +31,20 @@ app.register_blueprint(network_health_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(probe_bp, url_prefix='/probe')
 
-# Health check endpoint for frontend dependency
+# --------------------------------------------------------------------------
+# DO I NEED THIS CODE? -> YES!
+# WHY? -> The Angular frontend has a "Cloud Health" page that continuously 
+# polls this exact '/health' endpoint. If you delete this code, your 
+# frontend's Cloud Health page will show the backend and database as "Offline" 
+# or completely fail. It's also required by the BackendHealthService in Angular.
+# --------------------------------------------------------------------------
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint to verify backend is running"""
+    """
+    Health check endpoint to verify backend is running.
+    Returns a simple JSON payload with 'status: healthy' if the Flask 
+    server is successfully processing requests.
+    """
     return jsonify({
         'status': 'healthy',
         'message': 'Backend server is running',

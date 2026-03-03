@@ -33,6 +33,9 @@ export class CloudHealthComponent implements OnInit, OnDestroy {
     constructor(private http: HttpClient) { }
 
     ngOnInit() {
+        // DO I NEED THIS CODE? -> YES!
+        // WHY? -> This array defines the 4 main services shown on the Cloud Health page.
+        // If you delete this, your page will be empty.
         this.services = [
             { name: 'Flask Backend', icon: 'bi-server', status: 'checking', message: 'Checking...', lastChecked: null },
             { name: 'DynamoDB', icon: 'bi-database-fill', status: 'checking', message: 'Checking...', lastChecked: null },
@@ -40,9 +43,10 @@ export class CloudHealthComponent implements OnInit, OnDestroy {
             { name: 'Network Probe', icon: 'bi-broadcast-pin', status: 'checking', message: 'Checking...', lastChecked: null }
         ];
 
+        // This triggers the first immediate check when you open the page
         this.checkAllServices();
 
-        // Refresh every 30 seconds
+        // Refresh every 30 seconds to keep the Cloud Health page updated live
         this.refreshSub = interval(30000).pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.checkAllServices();
         });
