@@ -16,7 +16,10 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   isMobile = false;
   isTablet = false;
   isDesktop = false;
-  
+
+  isHidden = false;
+  private lastScrollPosition = 0;
+
   private destroy$ = new Subject<void>();
   private touchStartTime = 0;
   private touchStartX = 0;
@@ -25,7 +28,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthService,
     public router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Initialize responsive state
@@ -42,11 +45,29 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.updateResponsiveState();
   }
 
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Determine scroll direction
+    if (currentScrollPosition > this.lastScrollPosition && currentScrollPosition > 50) {
+      this.isHidden = true; // Scrolling down
+    } else {
+      this.isHidden = false; // Scrolling up
+    }
+
+    this.lastScrollPosition = currentScrollPosition;
+  }
+
+  logout() {
+    this.authService.logout();
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
     const mobileMenuBtn = target.closest('.mobile-menu-btn');
-    
+
     // Close mobile menu if clicking outside (but not on the button itself)
     if (!mobileMenuBtn && this.isMobileMenuOpen) {
       this.isMobileMenuOpen = false;
@@ -82,10 +103,10 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
       const touchDuration = touchEndTime - this.touchStartTime;
       const touchDistanceX = Math.abs(touch.clientX - this.touchStartX);
       const touchDistanceY = Math.abs(touch.clientY - this.touchStartY);
-      
+
       // Detect tap vs swipe (tap should be quick and minimal movement)
       const isTap = touchDuration < 300 && touchDistanceX < 10 && touchDistanceY < 10;
-      
+
       if (isTap) {
         this.handleTouchTap(event);
       }
@@ -103,7 +124,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
   private handleTouchTap(event: TouchEvent) {
     const target = event.target as HTMLElement;
-    
+
     // Add touch feedback for interactive elements
     if (target.closest('.nav-tab')) {
       target.style.transform = 'scale(0.95)';
@@ -116,7 +137,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     this.notifySidebarToggle();
-    
+
     // Provide haptic feedback on mobile devices
     if ((this.isMobile || this.isTablet) && 'vibrate' in navigator) {
       navigator.vibrate(30);
@@ -172,7 +193,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   needsCompactNavigation(): boolean {
     const screenWidth = window.innerWidth;
     const hasAdminAccess = this.authService.isAdmin();
-    
+
     // Use compact mode based on screen width and admin access
     if (screenWidth < 768) {
       return true; // Always compact on mobile
@@ -183,7 +204,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     } else if (screenWidth < 1600) {
       return hasAdminAccess; // Compact on large desktop if admin
     }
-    
+
     return false; // No compact mode on very large screens (1600px+)
   }
 
@@ -191,7 +212,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   getNavLabel(fullLabel: string): string {
     const screenWidth = window.innerWidth;
     const hasAdminAccess = this.authService.isAdmin();
-    
+
     // Use ultra-short labels for very small screens or when admin with many tabs
     if (screenWidth < 640 || (hasAdminAccess && screenWidth < 1200)) {
       const ultraShortLabels: { [key: string]: string } = {
@@ -203,7 +224,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
       };
       return ultraShortLabels[fullLabel] || fullLabel;
     }
-    
+
     // Use short labels for compact mode
     if (this.needsCompactNavigation()) {
       const shortLabels: { [key: string]: string } = {
@@ -215,7 +236,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
       };
       return shortLabels[fullLabel] || fullLabel;
     }
-    
+
     return fullLabel;
   }
 }
