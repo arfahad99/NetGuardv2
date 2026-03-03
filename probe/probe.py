@@ -15,7 +15,7 @@ API_KEY        = os.getenv('PROBE_API_KEY',  'changeme')
 DEVICE_ID      = os.getenv('DEVICE_ID',      'home-probe-01')
 INTERVAL       = int(os.getenv('INTERVAL_SECONDS', 30))
 PING_TARGET    = os.getenv('PING_TARGET',    '8.8.8.8')
-PING_COUNT     = int(os.getenv('PING_COUNT',  10))
+PING_COUNT     = int(os.getenv('PING_COUNT',  30))
 
 logging.basicConfig(level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s')

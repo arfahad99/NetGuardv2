@@ -130,11 +130,11 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
       if (record.deviceId !== undefined) {
         switch (this.metric) {
           case 'bandwidth':
-            return (record.downloadMbps || 0) + (record.uploadMbps || 0);
+            return parseFloat(record.downloadMbps || 0) + parseFloat(record.uploadMbps || 0);
           case 'latency':
-            return record.latencyMs || 0;
+            return parseFloat(record.latencyMs || 0);
           case 'packet_loss':
-            return record.packetLoss || 0;
+            return parseFloat(record.packetLoss || 0);
           case 'uptime':
             return record.uptimeStatus === 'online' ? 100 : 0;
         }
