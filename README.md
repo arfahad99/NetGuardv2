@@ -606,10 +606,16 @@ Comprehensive monitoring dashboard:
 - [ ] Custom dashboards
 
 ### Long-term
-- [ ] AI/ML features
-- [ ] Multi-tenancy support
-- [ ] Two-factor authentication
-- [ ] Advanced reporting
+- [ ] AI/ML features for predictive anomaly detection
+- [ ] Multi-tenancy support for managed service providers
+- [ ] Two-factor authentication (2FA/MFA)
+- [ ] Advanced BI reporting and automated PDF generation
+
+### Enterprise Scaling Strategy (FIM & Alternative Probes)
+As the architecture scales, the following technical improvements have been identified to support zero-trust models and decentralized monitoring:
+- **Federated Identity Management (FIM)**: Migration to **AWS Cognito** is planned to support seamless User Authentication using Phone and Email, alongside SSO implementations integrating Social Media Logins (Google, Facebook/Meta) via OAuth 2.0. This will offload JWT generation and signature verification directly to AWS KMS JWKS endpoints.
+- **Downloadable Local Agents**: Offering users standard downloadable agents (e.g. MSI/PKG format) operating as background services on personal devices to capture comprehensive end-user latency back to the edge.
+- **Browser-based Fallback Probes**: Using HTML5 Network Information APIs and WebSockets within the frontend client itself to passively run non-intrusive monitoring tests (Option 3) for users who cannot or will not install local scripts.
 
 ---
 
