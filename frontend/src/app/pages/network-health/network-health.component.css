@@ -1,9 +1,200 @@
-/* Network Health specific styles */
+/* ══════════════════════════════════════════════════════════════
+   Network Health / Measurements Page Styles
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Page header ─────────────────────────────────────────────── */
 .page-header {
   background: var(--success-gradient) !important;
 }
 
-/* Progress bar for packet loss */
+.device-select {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 20px;
+  padding: 6px 16px;
+  min-width: 180px;
+  font-size: 0.875rem;
+}
+
+.device-select:focus {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.device-select option {
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+/* ── Live stat cards ─────────────────────────────────────────── */
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.horizontal {
+  flex-direction: row;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.stat-icon.latency {
+  background: rgba(242, 201, 76, 0.15);
+  color: #f2c94c;
+}
+
+.stat-icon.download {
+  background: rgba(78, 165, 224, 0.15);
+  color: #4ea5e0;
+}
+
+.stat-icon.upload {
+  background: rgba(56, 239, 125, 0.15);
+  color: #38ef7d;
+}
+
+.stat-icon.packet-loss {
+  background: rgba(244, 92, 67, 0.15);
+  color: #f45c43;
+}
+
+.stat-icon.uptime-online {
+  background: rgba(56, 239, 125, 0.15);
+  color: #38ef7d;
+}
+
+.stat-icon.uptime-offline {
+  background: rgba(244, 92, 67, 0.15);
+  color: #f45c43;
+}
+
+.stat-icon.timestamp-icon {
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+}
+
+.stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-value small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* ── Range selector ──────────────────────────────────────────── */
+.range-group {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.range-group .btn {
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.range-group .btn:hover {
+  color: var(--text-primary);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.range-group .btn.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+/* ── Averages stats bar ──────────────────────────────────────── */
+.avg-stats-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.avg-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.avg-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.avg-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.avg-value small {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* ── Table ───────────────────────────────────────────────────── */
+.table-danger-subtle {
+  background: rgba(244, 92, 67, 0.06) !important;
+}
+
+/* ── Progress bar for packet loss ────────────────────────────── */
 .progress-bar-custom {
   height: 8px;
   background: rgba(255, 255, 255, 0.1);
@@ -31,7 +222,7 @@
   background: linear-gradient(90deg, #f45c43, #eb3349);
 }
 
-/* Bandwidth indicators */
+/* ── Bandwidth indicators ────────────────────────────────────── */
 .bi-arrow-up {
   color: #38ef7d !important;
 }
@@ -40,7 +231,7 @@
   color: #4ea5e0 !important;
 }
 
-/* Uptime badge styles */
+/* ── Uptime badge styles ─────────────────────────────────────── */
 .badge-status.badge-online {
   background: rgba(56, 239, 125, 0.2);
   color: #38ef7d;
@@ -56,7 +247,7 @@
   color: #f45c43;
 }
 
-/* Success gradient button */
+/* ── Gradient buttons ────────────────────────────────────────── */
 .btn-gradient-success {
   background: var(--success-gradient);
   border: none;
@@ -68,7 +259,7 @@
   color: white;
 }
 
-/* Modal customizations */
+/* ── Modal ───────────────────────────────────────────────────── */
 .modal-dark {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -82,13 +273,30 @@
   border-top-color: var(--border-color);
 }
 
-/* Light mode adjustments */
+/* ── Empty graphs placeholder ────────────────────────────────── */
+.empty-graphs {
+  background: var(--card-bg);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Light mode ──────────────────────────────────────────────── */
 body.light-mode .page-header {
   color: white !important;
 }
 
 body.light-mode .page-header .opacity-75 {
   color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.light-mode .stat-card {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 body.light-mode .modal-dark {
@@ -103,4 +311,59 @@ body.light-mode .modal-footer {
 
 body.light-mode .progress-bar-custom {
   background: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .avg-stats-bar {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .device-select {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+body.light-mode .range-group {
+  border-color: #e2e8f0;
+}
+
+body.light-mode .empty-graphs {
+  background: white;
+  border-color: #e2e8f0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .avg-stats-bar {
+    padding: 12px;
+  }
+
+  .avg-stat {
+    min-width: 80px;
+  }
+
+  .avg-value {
+    font-size: 0.95rem;
+  }
+
+  .range-group .btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
 }

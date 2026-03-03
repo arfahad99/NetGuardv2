@@ -14,6 +14,24 @@ import { ProbeService, Measurement } from '../../services/probe.service';
   styleUrls: ['./network-health.component.css']
 })
 export class NetworkHealthComponent implements OnInit, OnDestroy {
+  // --- Probe / Measurement data ---
+  latest: Measurement | null = null;
+  history: Measurement[] = [];
+  allDeviceIds: string[] = [];
+  deviceId = 'home-probe-01';
+  range = '24h';
+  loadingMeasurements = true;
+  private refreshTimer: any;
+
+  // Computed stats from history
+  avgLatency = 0;
+  avgDownload = 0;
+  avgUpload = 0;
+  avgPacketLoss = 0;
+  uptimePercent = 0;
+  totalMeasurements = 0;
+
+  // --- Legacy Network Health CRUD ---
   records: any[] = [];
   filteredRecords: any[] = [];
   uniqueSites: string[] = [];
@@ -29,11 +47,8 @@ export class NetworkHealthComponent implements OnInit, OnDestroy {
   Math = Math;
   form = { site: '', interface: '', upload_mbps: 0, download_mbps: 0, latency_ms: 0, packet_loss_percent: 0, uptime_percent: 99 };
 
-  latest: Measurement | null = null;
-  history: Measurement[] = [];
-  deviceId = 'home-probe-01';
-  range = '1h';
-  private refreshTimer: any;
+  // Tab control
+  activeTab: 'measurements' | 'records' = 'measurements';
 
   constructor(
     private api: ApiService,
@@ -43,45 +58,140 @@ export class NetworkHealthComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.loadDeviceList();
+    this.loadMeasurements();
     this.loadRecords();
-    this.loadData();
-    this.refreshTimer = setInterval(() => this.loadData(), 60_000);
+    // Auto-refresh every 60s
+    this.refreshTimer = setInterval(() => this.loadMeasurements(), 60_000);
   }
 
   ngOnDestroy(): void {
     clearInterval(this.refreshTimer);
   }
 
-  loadData(): void {
+  // ── Device list from probe ──────────────────────────────────
+  loadDeviceList(): void {
+    this.probe.getDevices().subscribe({
+      next: res => {
+        this.allDeviceIds = res.devices || [];
+        if (this.allDeviceIds.length > 0 && !this.allDeviceIds.includes(this.deviceId)) {
+          this.deviceId = this.allDeviceIds[0];
+        }
+      },
+      error: () => { /* silent — keep default */ }
+    });
+  }
+
+  // ── Load probe latest + history ─────────────────────────────
+  loadMeasurements(): void {
+    this.loadingMeasurements = true;
+
+    // Latest
     this.probe.getLatest(this.deviceId).subscribe({
       next: m => this.latest = m,
-      error: e => console.error('Probe latest failed', e)
+      error: () => { /* silent */ }
     });
 
+    // History
     const now = new Date();
     const start = new Date(now);
     if (this.range === '1h') start.setHours(now.getHours() - 1);
-    if (this.range === '24h') start.setDate(now.getDate() - 1);
-    if (this.range === '7d') start.setDate(now.getDate() - 7);
+    else if (this.range === '6h') start.setHours(now.getHours() - 6);
+    else if (this.range === '24h') start.setDate(now.getDate() - 1);
+    else if (this.range === '7d') start.setDate(now.getDate() - 7);
+    else if (this.range === '30d') start.setDate(now.getDate() - 30);
 
     this.probe.getHistory(
       this.deviceId,
       start.toISOString(),
       now.toISOString()
     ).subscribe({
-      next: items => { this.history = items; this.buildCharts(); },
-      error: e => console.error('Probe history failed', e)
+      next: items => {
+        this.history = items;
+        this.totalMeasurements = items.length;
+        this.computeStats();
+        this.loadingMeasurements = false;
+      },
+      error: () => {
+        this.loadingMeasurements = false;
+      }
     });
   }
 
-  buildCharts(): void {
+  // ── Compute aggregated stats ────────────────────────────────
+  computeStats(): void {
+    if (this.history.length === 0) {
+      this.avgLatency = 0;
+      this.avgDownload = 0;
+      this.avgUpload = 0;
+      this.avgPacketLoss = 0;
+      this.uptimePercent = 0;
+      return;
+    }
+
+    let totalLat = 0, totalDl = 0, totalUl = 0, totalPl = 0, onlineCount = 0;
+    for (const m of this.history) {
+      totalLat += Number(m.latencyMs) || 0;
+      totalDl += Number(m.downloadMbps) || 0;
+      totalUl += Number(m.uploadMbps) || 0;
+      totalPl += Number(m.packetLoss) || 0;
+      if (m.uptimeStatus === 'online') onlineCount++;
+    }
+    const n = this.history.length;
+    this.avgLatency = Math.round((totalLat / n) * 100) / 100;
+    this.avgDownload = Math.round((totalDl / n) * 100) / 100;
+    this.avgUpload = Math.round((totalUl / n) * 100) / 100;
+    this.avgPacketLoss = Math.round((totalPl / n) * 100) / 100;
+    this.uptimePercent = Math.round((onlineCount / n) * 10000) / 100;
   }
 
+  // ── Range / device change ───────────────────────────────────
   onRangeChange(r: string): void {
     this.range = r;
-    this.loadData();
+    this.loadMeasurements();
   }
 
+  onDeviceChange(id: string): void {
+    this.deviceId = id;
+    this.loadMeasurements();
+  }
+
+  // ── Alert severity helpers ──────────────────────────────────
+  getLatencyClass(): string {
+    if (!this.latest) return '';
+    if (Number(this.latest.latencyMs) > 100) return 'text-danger';
+    if (Number(this.latest.latencyMs) > 50) return 'text-warning';
+    return 'text-success';
+  }
+
+  getPacketLossClass(): string {
+    if (!this.latest) return '';
+    if (Number(this.latest.packetLoss) > 5) return 'text-danger';
+    if (Number(this.latest.packetLoss) > 1) return 'text-warning';
+    return 'text-success';
+  }
+
+  getDownloadClass(): string {
+    if (!this.latest) return '';
+    if (Number(this.latest.downloadMbps) < 10) return 'text-danger';
+    if (Number(this.latest.downloadMbps) < 50) return 'text-warning';
+    return 'text-success';
+  }
+
+  formatTimestamp(ts: string): string {
+    if (!ts) return 'N/A';
+    const d = new Date(ts);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  formatDate(ts: string): string {
+    if (!ts) return 'N/A';
+    const d = new Date(ts);
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+      d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ── Legacy CRUD (kept for backward compat) ──────────────────
   loadRecords() {
     this.loading = true;
     this.api.getNetworkHealth(this.currentPage, 20).subscribe({

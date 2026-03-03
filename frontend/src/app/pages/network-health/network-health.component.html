@@ -1,94 +1,211 @@
+<!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
 <div class="page-header" style="background: var(--success-gradient);">
   <div class="row align-items-center">
     <div class="col">
-      <h2 class="mb-1 fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>Network Health</h2>
-      <p class="mb-0 opacity-75">Monitor network performance metrics</p>
+      <h2 class="mb-1 fw-bold"><i class="bi bi-activity me-2"></i>Network Measurements</h2>
+      <p class="mb-0 opacity-75">Real-time network performance from probe data</p>
     </div>
-    <div class="col-auto">
-      <button class="btn btn-light rounded-pill px-4" (click)="openModal()" *ngIf="auth.canEdit()"><i
-          class="bi bi-plus-lg me-2"></i>Add Record</button>
-      <div *ngIf="auth.isGuest()" class="alert alert-info mb-0 py-2 px-3"><i
-          class="bi bi-info-circle me-2"></i><small>Guest users have read-only access</small></div>
-    </div>
-  </div>
-</div>
-
-<!-- Probe Metrics -->
-<div class='alerts mb-4' *ngIf='latest?.alertFlag'>
-  <div class='alert alert-danger'>
-    <i class="bi bi-exclamation-triangle-fill me-2"></i> Performance threshold breached — check your connection
-  </div>
-</div>
-
-<div class='metric-cards' style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-  <div class='card p-3 w-100' *ngIf='latest'>
-    <span class='label text-secondary'>Latency</span>
-    <span class='value fw-bold'>{{ latest.latencyMs }} ms</span>
-  </div>
-  <div class='card p-3 w-100' *ngIf='latest'>
-    <span class='label text-secondary'>Packet Loss</span>
-    <span class='value fw-bold'>{{ latest.packetLoss }}%</span>
-  </div>
-  <div class='card p-3 w-100' *ngIf='latest'>
-    <span class='label text-secondary'>Download</span>
-    <span class='value fw-bold'>{{ latest.downloadMbps }} Mbps</span>
-  </div>
-  <div class='card p-3 w-100' *ngIf='latest'>
-    <span class='label text-secondary'>Uptime</span>
-    <span class="badge"
-      [ngClass]="{'bg-success': latest.uptimeStatus === 'online', 'bg-danger': latest.uptimeStatus !== 'online'}">
-      {{ latest.uptimeStatus }}
-    </span>
-  </div>
-</div>
-
-<div class='range-selector mb-3'>
-  <div class="btn-group">
-    <button class="btn btn-outline-light" [class.active]="range === '1h'" (click)="onRangeChange('1h')">1h</button>
-    <button class="btn btn-outline-light" [class.active]="range === '24h'" (click)="onRangeChange('24h')">24h</button>
-    <button class="btn btn-outline-light" [class.active]="range === '7d'" (click)="onRangeChange('7d')">7d</button>
-  </div>
-</div>
-
-<!-- Network Health Graphs -->
-<div class="row g-4 mb-4" *ngIf="history.length > 0">
-  <div class="col-lg-6">
-    <app-network-health-graph [data]="history" metric="bandwidth" [height]="250">
-    </app-network-health-graph>
-  </div>
-  <div class="col-lg-6">
-    <app-network-health-graph [data]="history" metric="latency" [height]="250">
-    </app-network-health-graph>
-  </div>
-</div>
-
-<div class="row g-4 mb-4" *ngIf="history.length > 0">
-  <div class="col-lg-6">
-    <app-network-health-graph [data]="history" metric="uptime" [height]="250">
-    </app-network-health-graph>
-  </div>
-  <div class="col-lg-6">
-    <app-network-health-graph [data]="history" metric="packet_loss" [height]="250">
-    </app-network-health-graph>
-  </div>
-</div>
-
-<div class="row mb-4">
-  <div class="col-md-8">
-    <div class="search-box">
-      <i class="bi bi-search"></i>
-      <input type="text" class="form-control form-control-dark" placeholder="Search by site or interface..."
-        [(ngModel)]="searchTerm" (input)="filterRecords()">
-    </div>
-  </div>
-  <div class="col-md-4">
-    <select class="form-select form-control-dark" [(ngModel)]="filterSite" (change)="filterRecords()">
-      <option value="">All Sites</option>
-      @for (site of uniqueSites; track site) {
-      <option [value]="site">{{ site }}</option>
+    <div class="col-auto d-flex align-items-center gap-2">
+      @if (allDeviceIds.length > 1) {
+      <select class="form-select form-select-sm device-select" [ngModel]="deviceId"
+        (ngModelChange)="onDeviceChange($event)">
+        @for (id of allDeviceIds; track id) {
+        <option [value]="id">{{ id }}</option>
+        }
+      </select>
+      } @else {
+      <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+        <i class="bi bi-hdd-network me-1"></i>{{ deviceId }}
+      </span>
       }
-    </select>
+    </div>
   </div>
+</div>
+
+<!-- ═══════════════════════ ALERT BANNER ═══════════════════════ -->
+@if (latest?.alertFlag) {
+<div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+  <div><strong>Threshold breached</strong> — One or more metrics exceed configured limits. Check your connection.</div>
+</div>
+}
+
+<!-- ═══════════════════ LIVE STAT CARDS ═══════════════════════ -->
+<div class="row g-3 mb-4">
+
+  <!-- Latency -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon latency"><i class="bi bi-clock-history"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Latency</span>
+        @if (latest) {
+        <span class="stat-value" [ngClass]="getLatencyClass()">{{ latest.latencyMs }} <small>ms</small></span>
+        } @else {
+        <span class="stat-value text-secondary">—</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Download -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon download"><i class="bi bi-arrow-down-circle-fill"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Download</span>
+        @if (latest) {
+        <span class="stat-value" [ngClass]="getDownloadClass()">{{ latest.downloadMbps }} <small>Mbps</small></span>
+        } @else {
+        <span class="stat-value text-secondary">—</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon upload"><i class="bi bi-arrow-up-circle-fill"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Upload</span>
+        @if (latest) {
+        <span class="stat-value text-info">{{ latest.uploadMbps }} <small>Mbps</small></span>
+        } @else {
+        <span class="stat-value text-secondary">—</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Packet Loss -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon packet-loss"><i class="bi bi-exclamation-diamond-fill"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Packet Loss</span>
+        @if (latest) {
+        <span class="stat-value" [ngClass]="getPacketLossClass()">{{ latest.packetLoss }}<small>%</small></span>
+        } @else {
+        <span class="stat-value text-secondary">—</span>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Uptime + Last Seen row -->
+@if (latest) {
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="stat-card horizontal">
+      <div class="stat-icon"
+        [ngClass]="{'uptime-online': latest.uptimeStatus === 'online', 'uptime-offline': latest.uptimeStatus !== 'online'}">
+        <i class="bi"
+          [ngClass]="{'bi-wifi': latest.uptimeStatus === 'online', 'bi-wifi-off': latest.uptimeStatus !== 'online'}"></i>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Status</span>
+        <span class="stat-value">
+          <span class="badge rounded-pill"
+            [ngClass]="{'bg-success': latest.uptimeStatus === 'online', 'bg-danger': latest.uptimeStatus !== 'online'}">
+            {{ latest.uptimeStatus | uppercase }}
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="stat-card horizontal">
+      <div class="stat-icon timestamp-icon"><i class="bi bi-calendar-check"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Last Measurement</span>
+        <span class="stat-value text-secondary" style="font-size: 0.95rem;">{{ formatDate(latest.timestamp) }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ═════════════════ TIME RANGE SELECTOR ══════════════════════ -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up me-2"></i>Performance Trends</h5>
+  <div class="btn-group range-group">
+    <button class="btn btn-sm" [class.active]="range === '1h'" (click)="onRangeChange('1h')">1H</button>
+    <button class="btn btn-sm" [class.active]="range === '6h'" (click)="onRangeChange('6h')">6H</button>
+    <button class="btn btn-sm" [class.active]="range === '24h'" (click)="onRangeChange('24h')">24H</button>
+    <button class="btn btn-sm" [class.active]="range === '7d'" (click)="onRangeChange('7d')">7D</button>
+    <button class="btn btn-sm" [class.active]="range === '30d'" (click)="onRangeChange('30d')">30D</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ GRAPHS ═════════════════════════════════ -->
+@if (loadingMeasurements) {
+<div class="text-center py-5">
+  <div class="spinner-border text-primary"></div>
+  <p class="text-secondary mt-2">Loading measurement data…</p>
+</div>
+} @else if (history.length === 0) {
+<div class="empty-graphs text-center py-5">
+  <i class="bi bi-graph-up" style="font-size: 3rem; opacity: 0.3;"></i>
+  <p class="text-secondary mt-2">No measurements in the selected time range.<br>Make sure the probe is running.</p>
+</div>
+} @else {
+<!-- Row 1: Bandwidth + Latency -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <app-network-health-graph [data]="history" metric="bandwidth" [height]="250"></app-network-health-graph>
+  </div>
+  <div class="col-lg-6">
+    <app-network-health-graph [data]="history" metric="latency" [height]="250"></app-network-health-graph>
+  </div>
+</div>
+
+<!-- Row 2: Uptime + Packet Loss -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <app-network-health-graph [data]="history" metric="uptime" [height]="250"></app-network-health-graph>
+  </div>
+  <div class="col-lg-6">
+    <app-network-health-graph [data]="history" metric="packet_loss" [height]="250"></app-network-health-graph>
+  </div>
+</div>
+
+<!-- ═══════════════ AVERAGE STATS BAR ═════════════════════════ -->
+<div class="avg-stats-bar mb-4">
+  <div class="avg-stat">
+    <span class="avg-label">Avg Latency</span>
+    <span class="avg-value">{{ avgLatency }} <small>ms</small></span>
+  </div>
+  <div class="avg-stat">
+    <span class="avg-label">Avg Download</span>
+    <span class="avg-value">{{ avgDownload }} <small>Mbps</small></span>
+  </div>
+  <div class="avg-stat">
+    <span class="avg-label">Avg Upload</span>
+    <span class="avg-value">{{ avgUpload }} <small>Mbps</small></span>
+  </div>
+  <div class="avg-stat">
+    <span class="avg-label">Avg Packet Loss</span>
+    <span class="avg-value">{{ avgPacketLoss }}<small>%</small></span>
+  </div>
+  <div class="avg-stat">
+    <span class="avg-label">Uptime</span>
+    <span class="avg-value">{{ uptimePercent }}<small>%</small></span>
+  </div>
+  <div class="avg-stat">
+    <span class="avg-label">Samples</span>
+    <span class="avg-value">{{ totalMeasurements }}</span>
+  </div>
+</div>
+}
+
+<!-- ═══════════════ MEASUREMENT HISTORY TABLE ══════════════════ -->
+@if (history.length > 0) {
+<div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+  <h5 class="mb-0 fw-bold"><i class="bi bi-table me-2"></i>Measurement History</h5>
+  <span class="text-secondary">{{ history.length }} measurements</span>
 </div>
 
 <div class="card">
@@ -96,82 +213,184 @@
     <table class="table table-dark-custom mb-0">
       <thead>
         <tr>
-          <th>Site</th>
-          <th>Interface</th>
-          <th>Bandwidth</th>
+          <th>Time</th>
           <th>Latency</th>
+          <th>Download</th>
+          <th>Upload</th>
           <th>Packet Loss</th>
-          <th>Uptime</th>
-          <th>Actions</th>
+          <th>Status</th>
+          <th>Alert</th>
         </tr>
       </thead>
       <tbody>
-        @if (loading) {
-        <tr>
-          <td colspan="7" class="text-center py-5">
-            <div class="spinner-border text-primary"></div>
-          </td>
-        </tr>
-        } @else if (filteredRecords.length === 0) {
-        <tr>
-          <td colspan="7">
-            <div class="empty-state"><i class="bi bi-heart-pulse"></i>
-              <p>No records found</p>
-            </div>
-          </td>
-        </tr>
-        } @else {
-        @for (record of filteredRecords; track record._id) {
-        <tr>
+        @for (m of history; track m.timestamp; let i = $index) {
+        @if (i < 50) { <tr [class.table-danger-subtle]="m.alertFlag">
           <td>
-            <div class="fw-semibold">{{ record.context?.site }}</div>
+            <span class="text-nowrap">{{ formatDate(m.timestamp) }}</span>
           </td>
-          <td><span class="badge bg-secondary rounded-pill">{{ record.context?.interface }}</span></td>
           <td>
-            <div class="d-flex align-items-center">
-              <i class="bi bi-arrow-up text-success me-1"></i>{{ record.metrics?.bandwidth?.upload_mbps || 0 }} Mbps
-              <i class="bi bi-arrow-down text-info ms-2 me-1"></i>{{ record.metrics?.bandwidth?.download_mbps || 0 }}
-              Mbps
-            </div>
+            <span [ngClass]="{
+              'text-danger': m.latencyMs > 100,
+              'text-warning': m.latencyMs > 50 && m.latencyMs <= 100,
+              'text-success': m.latencyMs <= 50
+            }">{{ m.latencyMs }} ms</span>
           </td>
-          <td>{{ record.metrics?.latency_ms || 0 }} ms</td>
           <td>
-            <div class="progress-bar-custom" style="width: 80px;">
-              <div class="fill" [class.success]="(record.metrics?.packet_loss_percent || 0) < 1"
-                [class.warning]="(record.metrics?.packet_loss_percent || 0) >= 1 && (record.metrics?.packet_loss_percent || 0) < 5"
-                [class.danger]="(record.metrics?.packet_loss_percent || 0) >= 5"
-                [style.width.%]="Math.min(record.metrics?.packet_loss_percent || 0, 100)"></div>
-            </div>
-            <small class="text-secondary">{{ record.metrics?.packet_loss_percent || 0 }}%</small>
+            <i class="bi bi-arrow-down text-info me-1"></i>{{ m.downloadMbps }} Mbps
           </td>
-          <td><span [class]="'badge-status badge-' + getUptimeClass(record.metrics?.uptime_percent)">{{
-              record.metrics?.uptime_percent || 0 }}%</span></td>
           <td>
-            <button class="action-btn view me-1" (click)="viewRecord(record)" title="View"><i
-                class="bi bi-eye"></i></button>
-            <button class="action-btn edit me-1" (click)="editRecord(record)" *ngIf="auth.canEdit()" title="Edit"><i
-                class="bi bi-pencil"></i></button>
-            <button class="action-btn delete" (click)="deleteRecord(record._id)" *ngIf="auth.canDelete()"
-              title="Delete"><i class="bi bi-trash"></i></button>
+            <i class="bi bi-arrow-up text-success me-1"></i>{{ m.uploadMbps }} Mbps
           </td>
-        </tr>
-        }
-        }
+          <td>
+            <span [ngClass]="{
+              'text-danger': m.packetLoss > 5,
+              'text-warning': m.packetLoss > 1 && m.packetLoss <= 5,
+              'text-success': m.packetLoss <= 1
+            }">{{ m.packetLoss }}%</span>
+          </td>
+          <td>
+            <span class="badge rounded-pill"
+              [ngClass]="{'bg-success': m.uptimeStatus === 'online', 'bg-danger': m.uptimeStatus !== 'online'}">
+              {{ m.uptimeStatus }}
+            </span>
+          </td>
+          <td>
+            @if (m.alertFlag) {
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+            } @else {
+            <i class="bi bi-check-circle-fill text-success"></i>
+            }
+          </td>
+          </tr>
+          }
+          }
+          @if (history.length > 50) {
+          <tr>
+            <td colspan="7" class="text-center text-secondary py-3">
+              <i class="bi bi-three-dots me-1"></i>Showing first 50 of {{ history.length }} measurements
+            </td>
+          </tr>
+          }
       </tbody>
     </table>
   </div>
 </div>
+}
 
-<div class="d-flex justify-content-between align-items-center mt-4">
-  <span class="text-secondary">Showing {{ filteredRecords.length }} records</span>
-  <div>
-    <button class="btn btn-outline-light rounded-pill me-2" [disabled]="currentPage === 1" (click)="changePage(-1)"><i
-        class="bi bi-chevron-left"></i> Previous</button>
-    <button class="btn btn-outline-light rounded-pill" (click)="changePage(1)">Next <i
-        class="bi bi-chevron-right"></i></button>
+<!-- ═══════ TAB: Legacy Network Health Records ════════════════ -->
+<div class="mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>Network Health Records</h5>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-light rounded-pill px-3" (click)="openModal()" *ngIf="auth.canEdit()">
+        <i class="bi bi-plus-lg me-1"></i>Add Record
+      </button>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-8">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" class="form-control form-control-dark" placeholder="Search by site or interface..."
+          [(ngModel)]="searchTerm" (input)="filterRecords()">
+      </div>
+    </div>
+    <div class="col-md-4">
+      <select class="form-select form-control-dark" [(ngModel)]="filterSite" (change)="filterRecords()">
+        <option value="">All Sites</option>
+        @for (site of uniqueSites; track site) {
+        <option [value]="site">{{ site }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-dark-custom mb-0">
+        <thead>
+          <tr>
+            <th>Site</th>
+            <th>Interface</th>
+            <th>Bandwidth</th>
+            <th>Latency</th>
+            <th>Packet Loss</th>
+            <th>Uptime</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="spinner-border text-primary"></div>
+            </td>
+          </tr>
+          } @else if (filteredRecords.length === 0) {
+          <tr>
+            <td colspan="7">
+              <div class="empty-state"><i class="bi bi-heart-pulse"></i>
+                <p>No records found</p>
+              </div>
+            </td>
+          </tr>
+          } @else {
+          @for (record of filteredRecords; track record._id) {
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ record.context?.site }}</div>
+            </td>
+            <td><span class="badge bg-secondary rounded-pill">{{ record.context?.interface }}</span></td>
+            <td>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-arrow-up text-success me-1"></i>{{ record.metrics?.bandwidth?.upload_mbps || 0 }} Mbps
+                <i class="bi bi-arrow-down text-info ms-2 me-1"></i>{{ record.metrics?.bandwidth?.download_mbps || 0 }}
+                Mbps
+              </div>
+            </td>
+            <td>{{ record.metrics?.latency_ms || 0 }} ms</td>
+            <td>
+              <div class="progress-bar-custom" style="width: 80px;">
+                <div class="fill" [class.success]="(record.metrics?.packet_loss_percent || 0) < 1"
+                  [class.warning]="(record.metrics?.packet_loss_percent || 0) >= 1 && (record.metrics?.packet_loss_percent || 0) < 5"
+                  [class.danger]="(record.metrics?.packet_loss_percent || 0) >= 5"
+                  [style.width.%]="Math.min(record.metrics?.packet_loss_percent || 0, 100)"></div>
+              </div>
+              <small class="text-secondary">{{ record.metrics?.packet_loss_percent || 0 }}%</small>
+            </td>
+            <td><span [class]="'badge-status badge-' + getUptimeClass(record.metrics?.uptime_percent)">{{
+                record.metrics?.uptime_percent || 0 }}%</span></td>
+            <td>
+              <button class="action-btn view me-1" (click)="viewRecord(record)" title="View"><i
+                  class="bi bi-eye"></i></button>
+              <button class="action-btn edit me-1" (click)="editRecord(record)" *ngIf="auth.canEdit()" title="Edit"><i
+                  class="bi bi-pencil"></i></button>
+              <button class="action-btn delete" (click)="deleteRecord(record._id)" *ngIf="auth.canDelete()"
+                title="Delete"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <span class="text-secondary">{{ filteredRecords.length }} records</span>
+    <div>
+      <button class="btn btn-outline-light rounded-pill me-2" [disabled]="currentPage === 1" (click)="changePage(-1)">
+        <i class="bi bi-chevron-left"></i> Previous
+      </button>
+      <button class="btn btn-outline-light rounded-pill" (click)="changePage(1)">
+        Next <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
   </div>
 </div>
 
+<!-- ═══════════════════════ EDIT/VIEW MODAL ════════════════════ -->
 @if (showModal) {
 <div class="modal d-block" style="background: rgba(0,0,0,0.7);">
   <div class="modal-dialog modal-lg modal-dialog-centered">
