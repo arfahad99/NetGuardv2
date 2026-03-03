@@ -434,11 +434,13 @@
 
 /* Hide user details when collapsed */
 .user-info.collapsed .user-details,
-.user-info.collapsed .dropdown-arrow {
+.user-info.collapsed .dropdown-arrow,
+.user-info.collapsed .dropdown-btn span {
   display: none;
 }
 
-.user-info.collapsed .user-toggle {
+.user-info.collapsed .user-toggle,
+.user-info.collapsed .dropdown-btn {
   justify-content: center;
   padding: 0.75rem 0.5rem;
 }
