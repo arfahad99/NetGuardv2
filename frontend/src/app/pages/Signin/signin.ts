@@ -7,6 +7,7 @@ import { ToastService } from '../../services/toast.service';
 import { TextFlipComponent } from '../../components/text-flip/text-flip.component';
 import { StatefulButtonComponent } from '../../components/stateful-button/stateful-button.component';
 import { MovingBorderDirective } from '../../components/directives/moving-border.directive';
+import { BackendStatusComponent } from '../../components/backend-status/backend-status.component';
 
 /**
  * Sign In Component
@@ -20,7 +21,7 @@ import { MovingBorderDirective } from '../../components/directives/moving-border
  */
 @Component({
   selector: 'app-signin',
-  imports: [CommonModule, FormsModule, RouterLink, TextFlipComponent, StatefulButtonComponent, MovingBorderDirective],
+  imports: [CommonModule, FormsModule, RouterLink, TextFlipComponent, StatefulButtonComponent, MovingBorderDirective, BackendStatusComponent],
   templateUrl: './signin.html',
   styleUrls: ['./signin.css']
 })
