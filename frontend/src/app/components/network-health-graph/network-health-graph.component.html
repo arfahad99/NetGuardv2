@@ -1,4 +1,4 @@
-<div class="graph-container">
+<div class="graph-container position-relative">
   <div class="graph-header">
     <h4 class="graph-title">{{ getMetricLabel() }}</h4>
     <div class="graph-legend">
@@ -45,9 +45,11 @@
 
       <!-- Data points -->
       @for (point of graphPoints; track point; let i = $index) {
-      <circle class="graph-point" [attr.cx]="point.x" [attr.cy]="normalizeY(point.y)" r="0.8"
-        [attr.fill]="getMetricColor()" [style.opacity]="animationProgress" [style.animation-delay]="(i * 50) + 'ms'">
-        <title>{{ point.y.toFixed(2) }}</title>
+      <circle class="graph-point" [attr.cx]="point.x" [attr.cy]="normalizeY(point.y)"
+        [attr.r]="selectedPoint === point ? '2' : '1.5'" [attr.fill]="getMetricColor()"
+        [style.opacity]="animationProgress" [style.animation-delay]="(i * 50) + 'ms'" (click)="showDetails(point)"
+        style="cursor: pointer; stroke: var(--card-bg); stroke-width: 0.5; transition: all 0.2s;">
+        <title>{{ point.timeLabel }} - {{ point.y.toFixed(2) }}</title>
       </circle>
       }
     </svg>
@@ -61,6 +63,31 @@
       }
     </div>
   </div>
+
+  <!-- X-axis Timeline Labels -->
+  <div class="d-flex justify-content-between mt-2 px-4 text-secondary" style="font-size: 0.75rem;">
+    <span>{{ graphPoints[0]?.timeLabel }}</span>
+    <span>{{ graphPoints[Math.floor(graphPoints.length / 2)]?.timeLabel || '' }}</span>
+    <span>{{ graphPoints[graphPoints.length - 1]?.timeLabel || 'Now' }}</span>
+  </div>
+
+  <!-- Detail Display Overlay -->
+  @if (selectedPoint) {
+  <div class="position-absolute p-3 rounded shadow-lg"
+    style="top: 10px; right: 10px; z-index: 10; font-size: 0.85rem; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid;"
+    [style.border-left-color]="getMetricColor()">
+    <div class="d-flex justify-content-between align-items-center mb-2 gap-4">
+      <strong [style.color]="getMetricColor()"><i class="bi bi-graph-up me-2"></i>{{ getMetricLabel() }}
+        Details</strong>
+      <i class="bi bi-x-circle text-secondary hover-white" style="cursor: pointer; font-size: 1.1rem;"
+        (click)="selectedPoint = null" title="Close"></i>
+    </div>
+    <div class="mb-1 text-secondary"><i class="bi bi-clock me-2"></i>Time: <strong class="text-white ms-1">{{
+        selectedPoint.timeLabel }}</strong></div>
+    <div class="mb-0 text-secondary"><i class="bi bi-activity me-2"></i>Value: <strong class="text-white fs-6 ms-1">{{
+        selectedPoint.y.toFixed(2) }}</strong></div>
+  </div>
+  }
 
   <!-- Stats -->
   <div class="graph-stats">

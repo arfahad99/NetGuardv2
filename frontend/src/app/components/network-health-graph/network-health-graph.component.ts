@@ -29,6 +29,8 @@ interface NetworkHealthData {
 interface GraphPoint {
   x: number;
   y: number;
+  timeLabel: string;
+  originalRecord?: any;
 }
 
 /**
@@ -70,6 +72,12 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
   areaPathData: string = '';
   gridLines: number[] = [0, 25, 50, 75, 100];
   animationProgress: number = 0;
+  selectedPoint: GraphPoint | null = null;
+  Math = Math;
+
+  showDetails(point: GraphPoint) {
+    this.selectedPoint = point;
+  }
 
   ngOnInit() {
     this.updateGraph();
@@ -107,13 +115,20 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
     };
 
     const range = ranges[this.metric];
-    const demoData = Array.from({ length: 20 }, () =>
-      range.min + Math.random() * (range.max - range.min)
-    );
+    const demoData = Array.from({ length: 20 }, (_, index) => {
+      const d = new Date();
+      d.setMinutes(d.getMinutes() - (19 - index) * 5);
+      return {
+        y: range.min + Math.random() * (range.max - range.min),
+        timeLabel: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+    });
 
-    this.graphPoints = demoData.map((value, index) => ({
+    this.graphPoints = demoData.map((data, index) => ({
       x: (index / 19) * 100,
-      y: value
+      y: data.y,
+      timeLabel: data.timeLabel,
+      originalRecord: { simulated: true }
     }));
 
     this.calculateBounds();
@@ -126,17 +141,18 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
    */
   extractDataPoints() {
     const values = this.data.map((record: any) => {
+      let val = 0;
       // If data is from DynamoDB probe endpoint (has deviceId)
       if (record.deviceId !== undefined) {
         switch (this.metric) {
           case 'bandwidth':
-            return parseFloat(record.downloadMbps || 0) + parseFloat(record.uploadMbps || 0);
+            val = parseFloat(record.downloadMbps || 0) + parseFloat(record.uploadMbps || 0); break;
           case 'latency':
-            return parseFloat(record.latencyMs || 0);
+            val = parseFloat(record.latencyMs || 0); break;
           case 'packet_loss':
-            return parseFloat(record.packetLoss || 0);
+            val = parseFloat(record.packetLoss || 0); break;
           case 'uptime':
-            return record.uptimeStatus === 'online' ? 100 : 0;
+            val = record.uptimeStatus === 'online' ? 100 : 0; break;
         }
       }
       // If data is from MongoDB backend (has metrics object)
@@ -144,20 +160,25 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
         const metrics = record.metrics;
         switch (this.metric) {
           case 'bandwidth':
-            return (metrics?.bandwidth?.download_mbps || 0) + (metrics?.bandwidth?.upload_mbps || 0);
+            val = (metrics?.bandwidth?.download_mbps || 0) + (metrics?.bandwidth?.upload_mbps || 0); break;
           case 'latency':
-            return metrics?.latency_ms || 0;
+            val = metrics?.latency_ms || 0; break;
           case 'packet_loss':
-            return metrics?.packet_loss_percent || 0;
+            val = metrics?.packet_loss_percent || 0; break;
           case 'uptime':
-            return metrics?.uptime_percent || 0;
+            val = metrics?.uptime_percent || 0; break;
         }
       }
+
+      let dateObj = record.timestamp ? new Date(record.timestamp) : new Date();
+      return { val, timeLabel: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), record };
     });
 
-    this.graphPoints = values.map((value, index) => ({
+    this.graphPoints = values.map((data, index) => ({
       x: (index / Math.max(values.length - 1, 1)) * 100,
-      y: value
+      y: data.val,
+      timeLabel: data.timeLabel,
+      originalRecord: data.record
     }));
   }
 
