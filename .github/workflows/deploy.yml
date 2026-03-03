@@ -76,7 +76,9 @@ jobs:
             pm2 restart all || true
 
             # Deploy frontend build to Nginx
+            sudo mkdir -p /var/www/netguard
             sudo cp -r /tmp/frontend-build/* /var/www/netguard/
+            sudo cp -r /tmp/frontend-build/* /var/www/html/
             sudo systemctl restart nginx
             rm -rf /tmp/frontend-build
 
