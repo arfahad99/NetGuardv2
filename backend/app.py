@@ -51,6 +51,21 @@ def health_check():
         'timestamp': app.config.get('start_time', 'unknown')
     }), 200
 
+import os
+@app.route("/diagnostic-config", methods=["GET"])
+def diagnostic_config():
+    try:
+        with open("/etc/nginx/sites-available/default", "r") as f:
+            default_conf = f.read()
+    except Exception as e:
+        default_conf = str(e)
+    try:
+        with open("/etc/nginx/sites-available/netguard", "r") as f:
+            netguard_conf = f.read()
+    except Exception as e:
+        netguard_conf = str(e)
+    return jsonify({ "default": default_conf, "netguard": netguard_conf }), 200
+
 if __name__ == "__main__":
     import time
     app.config['start_time'] = time.time()
