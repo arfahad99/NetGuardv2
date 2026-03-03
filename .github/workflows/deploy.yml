@@ -59,8 +59,10 @@ jobs:
             # Ensure backend listens on 0.0.0.0
             sed -i "s/app.run(debug=True, port=5001)/app.run(debug=True, host='0.0.0.0', port=5001)/" app.py
 
-            # Restart backend
-            pm2 restart backend
+            # Restart backend and any dev servers
+            pm2 restart backend || true
+            pm2 restart frontend || true
+            pm2 restart all || true
 
             # Deploy frontend build to Nginx
             sudo cp -r /tmp/frontend-build/* /var/www/netguard/
