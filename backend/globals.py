@@ -34,7 +34,6 @@ def _to_decimal(obj):
     if isinstance(obj, list):
         return [_to_decimal(i) for i in obj]
     if isinstance(obj, bytes):
-        # bcrypt hashes — store as string
         return obj.decode('utf-8')
     return obj
 
@@ -58,11 +57,9 @@ class InsertOneResult:
     def __init__(self, inserted_id):
         self.inserted_id = inserted_id
 
-
 class UpdateResult:
     def __init__(self, modified_count):
         self.modified_count = modified_count
-
 
 class DeleteResult:
     def __init__(self, deleted_count):
@@ -92,85 +89,101 @@ class DynamoCursor:
             yield _from_decimal(item)
 
 
-# ---------- DynamoWrapper – drop-in replacement for MongoWrapper -------------
+# ---------- DynamoWrapper – drop-in replacement for MongoDB ------------------
 
 class DynamoWrapper:
     """
-    Wraps a single DynamoDB table and exposes an API compatible with the
-    existing MongoWrapper so that blueprint code doesn't need to change.
+    Wraps a single DynamoDB table and exposes an API compatible with
+    pymongo so that blueprint code doesn't need to change.
+    DynamoDB key = 'id', exposed as '_id' for MongoDB compat.
     """
 
     def __init__(self, table_name):
         self.table = dynamodb.Table(table_name)
         self._table_name = table_name
 
+    # -- key mapping helpers --------------------------------------------------
+
+    def _to_mongo(self, item):
+        """DynamoDB item (id) -> MongoDB-style (_id)."""
+        if item and 'id' in item:
+            item['_id'] = item.pop('id')
+        return item
+
+    def _to_dynamo(self, doc):
+        """MongoDB-style doc (_id) -> DynamoDB (id)."""
+        doc = dict(doc)
+        if '_id' in doc:
+            doc['id'] = doc.pop('_id')
+        return doc
+
     # -- find (scan) ----------------------------------------------------------
 
     def find(self, query=None, projection=None):
-        """Scan / filter the table.  Returns a DynamoCursor."""
-        if query and query != {}:
-            # Build filter expression
-            filter_expr = None
-            expr_values = {}
-            expr_names = {}
-            idx = 0
-            for key, val in query.items():
-                if key == '_id':
-                    key = '_id'
-                if isinstance(val, dict):
-                    # Handle $ne, $or etc. – simplified
-                    if '$ne' in val:
-                        cond = Attr(key).ne(val['$ne'])
-                    else:
-                        continue
+        query = dict(query) if query else {}
+        # Remap _id -> id in query
+        if '_id' in query:
+            query['id'] = query.pop('_id')
+
+        filter_expr = None
+
+        # Handle $or
+        if '$or' in query:
+            or_conds = []
+            for sub in query['$or']:
+                for k, v in sub.items():
+                    k = 'id' if k == '_id' else k
+                    or_conds.append(Attr(k).eq(v))
+            if or_conds:
+                combined = or_conds[0]
+                for c in or_conds[1:]:
+                    combined = combined | c
+                filter_expr = combined
+            query = {k: v for k, v in query.items() if k != '$or'}
+
+        for key, val in query.items():
+            if isinstance(val, dict):
+                if '$ne' in val:
+                    cond = Attr(key).ne(val['$ne'])
                 else:
-                    cond = Attr(key).eq(val)
-                filter_expr = cond if filter_expr is None else (filter_expr & cond)
-
-            # Handle $or queries
-            if '$or' in (query or {}):
-                or_conds = []
-                for sub in query['$or']:
-                    for k2, v2 in sub.items():
-                        or_conds.append(Attr(k2).eq(v2))
-                if or_conds:
-                    combined = or_conds[0]
-                    for c in or_conds[1:]:
-                        combined = combined | c
-                    filter_expr = combined if filter_expr is None else (filter_expr & combined)
-
-            if filter_expr:
-                resp = self.table.scan(FilterExpression=filter_expr)
+                    continue
             else:
-                resp = self.table.scan()
-        else:
-            resp = self.table.scan()
+                cond = Attr(key).eq(val)
+            filter_expr = cond if filter_expr is None else (filter_expr & cond)
 
+        kwargs = {}
+        if filter_expr:
+            kwargs['FilterExpression'] = filter_expr
+
+        resp = self.table.scan(**kwargs)
         items = resp.get('Items', [])
-        # Handle pagination for large tables
         while 'LastEvaluatedKey' in resp:
-            if query and query != {} and filter_expr:
-                resp = self.table.scan(
-                    FilterExpression=filter_expr,
-                    ExclusiveStartKey=resp['LastEvaluatedKey']
-                )
-            else:
-                resp = self.table.scan(ExclusiveStartKey=resp['LastEvaluatedKey'])
+            kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+            resp = self.table.scan(**kwargs)
             items.extend(resp.get('Items', []))
 
+        items = [self._to_mongo(dict(item)) for item in items]
         return DynamoCursor(items)
 
     # -- find_one -------------------------------------------------------------
 
     def find_one(self, query=None, projection=None):
-        """Return first matching item or None."""
-        if query and '_id' in query and isinstance(query['_id'], str):
-            # Direct get by key
-            resp = self.table.get_item(Key={'_id': query['_id']})
-            item = resp.get('Item')
-            return _from_decimal(item) if item else None
+        query = dict(query) if query else {}
+        if '_id' in query:
+            query['id'] = query.pop('_id')
 
-        # Otherwise scan with limit 1
+        # Direct get if only querying by id
+        if 'id' in query and isinstance(query['id'], str) and len(query) == 1:
+            resp = self.table.get_item(Key={'id': query['id']})
+            item = resp.get('Item')
+            if item:
+                return _from_decimal(self._to_mongo(dict(item)))
+            return None
+
+        # Otherwise scan
+        # Remap id back to _id for find()
+        if 'id' in query:
+            query['_id'] = query.pop('id')
         cursor = self.find(query)
         for item in cursor:
             return item
@@ -179,23 +192,29 @@ class DynamoWrapper:
     # -- insert_one -----------------------------------------------------------
 
     def insert_one(self, doc):
-        """Insert a document, auto-generating _id if missing."""
-        doc = dict(doc)  # copy
-        if '_id' not in doc:
-            doc['_id'] = str(uuid.uuid4())
+        doc = dict(doc)
+        generated_id = str(uuid.uuid4())
+        if '_id' not in doc and 'id' not in doc:
+            doc['_id'] = generated_id
+        doc = self._to_dynamo(doc)
         doc = _to_decimal(doc)
-        # Remove empty string values (DynamoDB doesn't allow them in some cases)
-        doc = {k: v for k, v in doc.items() if v != ''}
+        # Remove empty strings (DynamoDB doesn't allow them as key values)
+        cleaned = {}
+        for k, v in doc.items():
+            if v == '' and k != 'id':
+                continue
+            if v is None:
+                continue
+            cleaned[k] = v
+        doc = cleaned
+        if 'id' not in doc:
+            doc['id'] = generated_id
         self.table.put_item(Item=doc)
-        return InsertOneResult(doc['_id'])
+        return InsertOneResult(doc['id'])
 
     # -- update_one -----------------------------------------------------------
 
     def update_one(self, query, update_data):
-        """
-        Update a single item.
-        Supports: {"$set": {field: value, ...}}
-        """
         item = self.find_one(query)
         if item is None:
             return UpdateResult(0)
@@ -203,83 +222,40 @@ class DynamoWrapper:
         item_id = item['_id']
         fields = update_data.get('$set', update_data)
 
-        # Flatten nested dot-notation keys into the document
-        update_expr_parts = []
-        expr_attr_names = {}
-        expr_attr_values = {}
-
-        idx = 0
         for key, val in fields.items():
             if '.' in key:
-                # DynamoDB doesn't support dot notation updates directly
-                # We need to read, modify, and write back
                 parts = key.split('.')
-                # Get the full item, modify nested field, put back
                 current = item
                 for p in parts[:-1]:
                     if p not in current or not isinstance(current[p], dict):
                         current[p] = {}
                     current = current[p]
                 current[parts[-1]] = val
-                # We'll do a full put instead
-                continue
+            else:
+                item[key] = val
 
-            alias = f"#k{idx}"
-            placeholder = f":v{idx}"
-            expr_attr_names[alias] = key
-            expr_attr_values[placeholder] = _to_decimal(val)
-            update_expr_parts.append(f"{alias} = {placeholder}")
-            idx += 1
-
-        if '.' in str(fields):
-            # Has nested updates – do full replace
-            item.update({k: v for k, v in fields.items() if '.' not in k})
-            # Apply nested updates to item
-            for key, val in fields.items():
-                if '.' in key:
-                    parts = key.split('.')
-                    current = item
-                    for p in parts[:-1]:
-                        if p not in current or not isinstance(current[p], dict):
-                            current[p] = {}
-                        current = current[p]
-                    current[parts[-1]] = val
-            item = _to_decimal(item)
-            self.table.put_item(Item=item)
-            return UpdateResult(1)
-
-        if not update_expr_parts:
-            return UpdateResult(0)
-
-        update_expr = "SET " + ", ".join(update_expr_parts)
-
-        try:
-            self.table.update_item(
-                Key={'_id': item_id},
-                UpdateExpression=update_expr,
-                ExpressionAttributeNames=expr_attr_names,
-                ExpressionAttributeValues=expr_attr_values
-            )
-            return UpdateResult(1)
-        except Exception:
-            return UpdateResult(0)
+        dynamo_item = self._to_dynamo(item)
+        dynamo_item = _to_decimal(dynamo_item)
+        dynamo_item = {k: v for k, v in dynamo_item.items() if v is not None}
+        if 'id' not in dynamo_item:
+            dynamo_item['id'] = item_id
+        self.table.put_item(Item=dynamo_item)
+        return UpdateResult(1)
 
     # -- delete_one -----------------------------------------------------------
 
     def delete_one(self, query):
-        """Delete a single item matching the query."""
         item = self.find_one(query)
         if item is None:
             return DeleteResult(0)
-
         try:
-            self.table.delete_item(Key={'_id': item['_id']})
+            self.table.delete_item(Key={'id': item['_id']})
             return DeleteResult(1)
         except Exception:
             return DeleteResult(0)
 
 
-# ---------- Collection instances (same names as before) ----------------------
+# ---------- Collection instances ---------------------------------------------
 
 Registerd_users = DynamoWrapper('NPMDB_Users')
 alerts          = DynamoWrapper('NPMDB_Alerts')
@@ -290,7 +266,7 @@ sessions        = DynamoWrapper('NPMDB_Sessions')
 blacklist       = DynamoWrapper('NPMDB_Blacklist')
 
 
-# ---------- DBWrapper (same interface as before) -----------------------------
+# ---------- DBWrapper --------------------------------------------------------
 
 class DBWrapper:
     @property
