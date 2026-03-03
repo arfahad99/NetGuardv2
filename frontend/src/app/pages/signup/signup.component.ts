@@ -6,10 +6,10 @@ import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
-    selector: 'app-signup',
-    imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: './signup.component.html',
-    styleUrls: ['./signup.component.css']
+  selector: 'app-signup',
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
   username = '';
@@ -17,20 +17,24 @@ export class SignupComponent {
   password = '';
   loading = false;
   showPassword = false;
-  
+
   usernameError = '';
   emailError = '';
   passwordError = '';
   serverError = '';
 
-  constructor(private authService: AuthService, private router: Router, private toast: ToastService) {}
+  awaitingVerification = false;
+  verificationCode = '';
+  verificationError = '';
+
+  constructor(private authService: AuthService, private router: Router, private toast: ToastService) { }
 
   validateUsername() {
     // Clear server error when user starts typing
     if (this.usernameError && this.usernameError.includes('already exists')) {
       this.usernameError = '';
     }
-    
+
     if (!this.username) {
       this.usernameError = 'Username is required';
     } else if (this.username.length < 3) {
@@ -50,7 +54,7 @@ export class SignupComponent {
     if (this.emailError && this.emailError.includes('already')) {
       this.emailError = '';
     }
-    
+
     if (!this.email) {
       this.emailError = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
@@ -79,9 +83,9 @@ export class SignupComponent {
     const hasLower = /[a-z]/.test(this.password);
     const hasNumber = /[0-9]/.test(this.password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
-    
+
     const score = (length >= 8 ? 1 : 0) + (hasUpper ? 1 : 0) + (hasLower ? 1 : 0) + (hasNumber ? 1 : 0) + (hasSpecial ? 1 : 0);
-    
+
     if (score <= 2) return 'Weak';
     if (score === 3) return 'Medium';
     return 'Strong';
@@ -105,7 +109,7 @@ export class SignupComponent {
     // Check if all fields are filled and no client-side validation errors
     const hasRequiredFields = !!(this.username && this.email && this.password);
     const hasNoClientErrors = !this.hasClientValidationErrors();
-    
+
     return hasRequiredFields && hasNoClientErrors;
   }
 
@@ -114,14 +118,14 @@ export class SignupComponent {
     const usernameClientError = this.usernameError && !this.usernameError.includes('already exists');
     const emailClientError = this.emailError && !this.emailError.includes('already');
     const passwordClientError = !!this.passwordError;
-    
+
     return !!(usernameClientError || emailClientError || passwordClientError);
   }
 
   hasServerErrors(): boolean {
     const usernameServerError = this.usernameError && this.usernameError.includes('already exists');
     const emailServerError = this.emailError && this.emailError.includes('already');
-    
+
     return !!(usernameServerError || emailServerError);
   }
 
@@ -145,7 +149,7 @@ export class SignupComponent {
     // Clear previous server errors
     this.serverError = '';
     this.clearServerFieldErrors();
-    
+
     this.validateUsername();
     this.validateEmail();
     this.validatePassword();
@@ -157,14 +161,45 @@ export class SignupComponent {
 
     this.loading = true;
     this.authService.signup(this.username, this.email, this.password).subscribe({
-      next: () => {
-        this.toast.success('Account created successfully! Please sign in.');
-        this.router.navigate(['/signin']);
+      next: (res: any) => {
+        if (res.requires_verification) {
+          this.toast.info('Please check your email for a verification code.');
+          this.awaitingVerification = true;
+          this.loading = false;
+        } else {
+          this.toast.success('Account created successfully! Please sign in.');
+          this.router.navigate(['/signin']);
+        }
       },
       error: (err) => {
         this.loading = false;
         this.handleSignupError(err);
       }
+    });
+  }
+
+  onVerify() {
+    if (!this.verificationCode) return;
+    this.loading = true;
+    this.verificationError = '';
+
+    this.authService.verifyEmail(this.username, this.verificationCode).subscribe({
+      next: () => {
+        this.toast.success('Email verified successfully! You can now sign in.');
+        this.router.navigate(['/signin']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.verificationError = err.error?.error || 'Verification failed. Please check the code and try again.';
+        this.toast.error(this.verificationError);
+      }
+    });
+  }
+
+  resendVerificationCode() {
+    this.authService.resendCode(this.username).subscribe({
+      next: () => this.toast.success('Verification code resent to your email!'),
+      error: (err) => this.toast.error(err.error?.error || 'Failed to resend verification code.')
     });
   }
 
@@ -187,7 +222,7 @@ export class SignupComponent {
     if (conflicts.includes('username')) {
       this.usernameError = 'This username already exists. Please choose a different one.';
     }
-    
+
     if (conflicts.includes('email')) {
       this.emailError = 'This email is already registered. Please use a different email.';
     }

@@ -56,6 +56,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/Signup`, { username, email, password });
   }
 
+  verifyEmail(username: string, code: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/Verify`, { username, code });
+  }
+
+  resendCode(username: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/ResendCode`, { username });
+  }
+
   logout(): void {
     const token = this.getToken();
     if (token) {

@@ -4,6 +4,9 @@ import bcrypt
 import jwt
 import datetime
 import uuid
+import os
+import boto3
+from botocore.exceptions import ClientError
 import globals
 
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
@@ -12,6 +15,10 @@ auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 # DB:Collections
 Registerd_users = globals.db.Registerd_users
 blacklist = globals.db.BlackList
+
+# Cognito Setup
+COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
+cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1')) if COGNITO_CLIENT_ID else None
 
 
 # --------------Signup Code Start---------------
@@ -63,6 +70,35 @@ def Signup():
             }), 409
         )
 
+    # 1. Amazon Cognito Integration (If configured)
+    if COGNITO_CLIENT_ID and cognito_client:
+        try:
+            # We use the email as the Cognito username usually, but we can pass attributes
+            resp = cognito_client.sign_up(
+                ClientId=COGNITO_CLIENT_ID,
+                Username=username,
+                Password=password,
+                UserAttributes=[
+                    {'Name': 'email', 'Value': email}
+                ]
+            )
+            
+            # Still store in local database to map roles/admin
+            hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+            doc = {"password": hashed, "username": username, "email": email, "admin": False, "verified": False}
+            result = globals.Registerd_users.insert_one(doc)
+
+            return make_response(jsonify({
+                "message": "Signup successful. Please verify your email.",
+                "requires_verification": True,
+                "user_id": str(result.inserted_id)
+            }), 201)
+            
+        except ClientError as e:
+            return make_response(jsonify({"error": e.response['Error']['Message']}), 400)
+
+    # 2. Local Database Fallback (If Cognito not configured)
+
     # Hash and store user
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     doc = {"password": hashed}
@@ -80,12 +116,62 @@ def Signup():
         jsonify(
             {
                 "message": "Signup successful,Go-to SignIn For Access",
+                "requires_verification": False,
                 "user_id": str(result.inserted_id),
             }
         ),
         201,
     )
 
+@auth_bp.route("/Verify", methods=["POST"])
+def Verify():
+    """Endpoint for Amazon Cognito Confirmation Code Verification"""
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "").strip()
+    code = data.get("code", "").strip()
+
+    if not username or not code:
+        return make_response(jsonify({"error": "Username and verification code required"}), 400)
+
+    if not COGNITO_CLIENT_ID or not cognito_client:
+        # If Cognito is disabled, auto-verify for dev
+        return make_response(jsonify({"message": "Local dev: auto-verified"}), 200)
+
+    try:
+        cognito_client.confirm_sign_up(
+            ClientId=COGNITO_CLIENT_ID,
+            Username=username,
+            ConfirmationCode=code
+        )
+        
+        # Mark as verified in local DB
+        Registerd_users.update_one({"username": username}, {"$set": {"verified": True}})
+
+        return make_response(jsonify({"message": "Verification successful. You can now log in."}), 200)
+
+    except ClientError as e:
+        return make_response(jsonify({"error": e.response['Error']['Message']}), 400)
+
+
+@auth_bp.route("/ResendCode", methods=["POST"])
+def ResendCode():
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "").strip()
+
+    if not username:
+        return make_response(jsonify({"error": "Username required"}), 400)
+
+    if not COGNITO_CLIENT_ID or not cognito_client:
+        return make_response(jsonify({"error": "Cognito not configured"}), 400)
+
+    try:
+        cognito_client.resend_confirmation_code(
+            ClientId=COGNITO_CLIENT_ID,
+            Username=username
+        )
+        return make_response(jsonify({"message": "Verification code resent."}), 200)
+    except ClientError as e:
+        return make_response(jsonify({"error": e.response['Error']['Message']}), 400)
 
 # --------------Signup Code End---------------
 
