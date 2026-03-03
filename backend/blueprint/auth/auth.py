@@ -99,10 +99,13 @@ def Signin():
     if not auth:
         return make_response(jsonify({"Message": "Authentication required"}), 401)
 
-    # Find user by username
-    user = Registerd_users.find_one({"username": auth.username})
+    login_identifier = auth.username
+    
+    # Find user by username OR email
+    user = Registerd_users.find_one({"$or": [{"username": login_identifier}, {"email": login_identifier}]})
+    
     if not user:
-        return make_response(jsonify({"Message": "Invalid username"}), 401)
+        return make_response(jsonify({"Message": "Invalid username or email"}), 401)
 
     # Compare password using bcrypt
     stored_pw = user["password"]
@@ -112,9 +115,12 @@ def Signin():
         # Determine role
         role = "admin" if user.get("admin", False) else user.get("role", "user")
         
+        # Get the actual username from the db (so the token always has the username)
+        actual_username = user.get("username", login_identifier)
+        
         token = jwt.encode(
             {
-                "user": auth.username,
+                "user": actual_username,
                 "admin": user.get("admin", False),
                 "role": role,
                 # Use UTC now for expiry
@@ -129,14 +135,13 @@ def Signin():
             "msg": "SignIn Successful", 
             "token": token,
             "role": role,
-            "username": auth.username
+            "username": actual_username
         }), 200)
 
     return make_response(jsonify({"Message": "Invalid password"}), 401)
 
 
 # --------------Signin Code End---------------
-
 
 # --------------Guest Login Code Start---------------
 

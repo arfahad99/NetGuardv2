@@ -19,33 +19,33 @@ import { MovingBorderDirective } from '../../components/directives/moving-border
  * - Stateful button with loading states
  */
 @Component({
-    selector: 'app-signin',
-    imports: [CommonModule, FormsModule, RouterLink, TextFlipComponent, StatefulButtonComponent, MovingBorderDirective],
-    templateUrl: './signin.html',
-    styleUrls: ['./signin.css']
+  selector: 'app-signin',
+  imports: [CommonModule, FormsModule, RouterLink, TextFlipComponent, StatefulButtonComponent, MovingBorderDirective],
+  templateUrl: './signin.html',
+  styleUrls: ['./signin.css']
 })
 export class SigninComponent {
   // Form fields
   username = '';
   password = '';
-  
+
   // UI state
   loading = false;
   showPassword = false;
   rememberMe = false;
   touched = false;
-  
+
   // Validation
   usernameError = '';
   passwordError = '';
   loginAttempts = 0;
-  
+
   // Auth token (for potential logout functionality)
   token: string | null = null;
 
   constructor(
-    private authService: AuthService, 
-    private router: Router, 
+    private authService: AuthService,
+    private router: Router,
     private toast: ToastService
   ) {
     // Restore remembered username if exists
@@ -58,9 +58,9 @@ export class SigninComponent {
 
   validateUsername() {
     if (!this.username) {
-      this.usernameError = 'Username is required';
+      this.usernameError = 'Username or Email is required';
     } else if (this.username.length < 3) {
-      this.usernameError = 'Username must be at least 3 characters';
+      this.usernameError = 'Username or Email must be at least 3 characters';
     } else {
       this.usernameError = '';
     }
@@ -96,7 +96,7 @@ export class SigninComponent {
     }
 
     this.loading = true;
-    
+
     return new Promise<void>((resolve, reject) => {
       this.authService.signin(this.username, this.password).subscribe({
         next: (res) => {
@@ -104,41 +104,41 @@ export class SigninComponent {
           if (res.token) {
             this.token = res.token;
           }
-          
+
           // Handle remember me
           if (this.rememberMe) {
             localStorage.setItem('rememberedUsername', this.username);
           } else {
             localStorage.removeItem('rememberedUsername');
           }
-          
+
           // Set login state
           this.authService.setLoginState(this.username);
-          
+
           // Get user info for welcome message
           const username = this.authService.getUsername();
           const role = this.authService.getRole();
           const roleDisplay = this.getRoleDisplay(role);
-          
+
           // Show success message
           this.toast.success(`Welcome back, ${username}! 👋\nRole: ${roleDisplay}`);
-          
+
           // Reset login attempts
           this.loginAttempts = 0;
           this.loading = false;
-          
+
           // Navigate to home page
           this.router.navigate(['/home']);
-          
+
           resolve();
         },
         error: (err) => {
           this.loading = false;
           this.loginAttempts++;
-          
+
           // Extract error message
           const errorMessage = err.error?.Message || err.error?.message || 'Sign in failed';
-          
+
           // Handle specific error types
           if (errorMessage.toLowerCase().includes('username')) {
             this.usernameError = 'Invalid username';
@@ -149,7 +149,7 @@ export class SigninComponent {
           } else {
             this.toast.error(errorMessage);
           }
-          
+
           // Clear password for security
           this.password = '';
           reject(err);
@@ -181,7 +181,7 @@ export class SigninComponent {
    */
   onLogout() {
     if (!this.token) return;
-    
+
     this.authService.signout().subscribe({
       next: () => {
         this.authService.clearLoginState();
