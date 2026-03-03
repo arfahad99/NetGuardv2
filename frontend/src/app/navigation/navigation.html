@@ -2,17 +2,16 @@
 <app-header></app-header>
 
 <!-- Collapsible Sidebar -->
-<app-collapsible-sidebar 
-  [externalToggle]="isSidebarExpanded" 
-  (sidebarToggle)="onSidebarToggle($event)">
+<app-collapsible-sidebar [externalToggle]="isSidebarExpanded" (sidebarToggle)="onSidebarToggle($event)">
 </app-collapsible-sidebar>
 
 <!-- Main Content -->
 <div class="main-content" [class.sidebar-expanded]="isSidebarExpanded && !isMobile">
   <div class="content-wrapper">
+    <app-backend-status></app-backend-status>
     <router-outlet></router-outlet>
   </div>
-  
+
   <!-- App Footer -->
   <app-footer></app-footer>
 </div>
