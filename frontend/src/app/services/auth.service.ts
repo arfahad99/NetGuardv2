@@ -15,14 +15,14 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(username: string, password: string): Observable<any> {
     const basicAuth = 'Basic ' + btoa(username + ':' + password);
     const headers = { 'Authorization': basicAuth };
-    
+
     console.log('Login attempt:', { url: `${this.apiUrl}/auth/Signin`, username });
-    
+
     return this.http.post(`${this.apiUrl}/auth/Signin`, {}, { headers }).pipe(
       tap((response: any) => {
         console.log('Login response:', response);
@@ -57,6 +57,20 @@ export class AuthService {
   }
 
   logout(): void {
+    const token = this.getToken();
+    if (token) {
+      // Create headers manually for the signout request to bypass potential interceptor issues
+      const headers = { 'x-access-token': token };
+      this.http.post(`${this.apiUrl}/auth/Signout`, {}, { headers }).subscribe({
+        next: () => this.clearLocalState(),
+        error: () => this.clearLocalState() // Clear local state even if backend fails
+      });
+    } else {
+      this.clearLocalState();
+    }
+  }
+
+  private clearLocalState(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     this.isAuthenticatedSubject.next(false);
@@ -207,7 +221,7 @@ export class AuthService {
   getRoleDisplayName(): string {
     const user = this.getUser();
     if (!user) return 'Guest';
-    
+
     if (user.is_admin) return 'Administrator';
     if (this.isGuest()) return 'Guest (Read-only)';
     return 'Standard User';
