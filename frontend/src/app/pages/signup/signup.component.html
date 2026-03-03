@@ -1,12 +1,14 @@
-<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #1a1d29 0%, #2d3250 100%);">
+<div class="min-vh-100 d-flex align-items-center justify-content-center"
+  style="background: linear-gradient(135deg, #1a1d29 0%, #2d3250 100%);">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-5">
         <div class="text-center mb-5">
-          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: var(--primary-gradient);">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+            style="width: 80px; height: 80px; background: var(--primary-gradient);">
             <i class="bi bi-hdd-network-fill text-white" style="font-size: 2rem;"></i>
           </div>
-          <h1 class="text-white fw-bold">NPM Dashboard</h1>
+          <h1 class="text-white fw-bold">NetworkPro</h1>
           <p class="text-secondary">Create your account</p>
         </div>
         <div class="card p-4">
@@ -14,99 +16,78 @@
             <h4 class="text-center mb-4">Sign Up</h4>
             <form (ngSubmit)="onSignup()" #signupForm="ngForm">
               @if (hasServerErrors()) {
-                <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
-                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                  <div>
-                    Please fix the highlighted fields below and try again.
-                  </div>
+              <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>
+                  Please fix the highlighted fields below and try again.
                 </div>
+              </div>
               }
               <div class="mb-3">
                 <label class="form-label text-secondary">Username *</label>
-                <input 
-                  type="text" 
-                  class="form-control form-control-dark" 
-                  [class.is-invalid]="usernameError"
+                <input type="text" class="form-control form-control-dark" [class.is-invalid]="usernameError"
                   [class.is-valid]="username && !usernameError"
                   [class.server-error]="usernameError && usernameError.includes('already exists')"
-                  [(ngModel)]="username" 
-                  name="username" 
-                  placeholder="Choose a username (min 3 characters)" 
-                  (blur)="validateUsername()"
-                  (input)="onUsernameInput()"
-                  required
-                  minlength="3">
+                  [(ngModel)]="username" name="username" placeholder="Choose a username (min 3 characters)"
+                  (blur)="validateUsername()" (input)="onUsernameInput()" required minlength="3">
                 @if (usernameError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ usernameError }}
-                  </div>
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ usernameError }}
+                </div>
                 }
                 @if (username && !usernameError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Username looks good!
-                  </div>
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Username looks good!
+                </div>
                 }
               </div>
               <div class="mb-3">
                 <label class="form-label text-secondary">Email *</label>
-                <input 
-                  type="email" 
-                  class="form-control form-control-dark" 
-                  [class.is-invalid]="emailError"
+                <input type="email" class="form-control form-control-dark" [class.is-invalid]="emailError"
                   [class.is-valid]="email && !emailError"
-                  [class.server-error]="emailError && emailError.includes('already')"
-                  [(ngModel)]="email" 
-                  name="email" 
-                  placeholder="Enter your email" 
-                  (blur)="validateEmail()"
-                  (input)="onEmailInput()"
-                  required>
+                  [class.server-error]="emailError && emailError.includes('already')" [(ngModel)]="email" name="email"
+                  placeholder="Enter your email" (blur)="validateEmail()" (input)="onEmailInput()" required>
                 @if (emailError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ emailError }}
-                  </div>
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ emailError }}
+                </div>
                 }
                 @if (email && !emailError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Email is valid!
-                  </div>
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Email is valid!
+                </div>
                 }
               </div>
               <div class="mb-3">
                 <label class="form-label text-secondary">Password *</label>
                 <div class="input-group">
-                  <input 
-                    [type]="showPassword ? 'text' : 'password'" 
-                    class="form-control form-control-dark" 
-                    [class.is-invalid]="passwordError"
-                    [class.is-valid]="password && !passwordError"
-                    [(ngModel)]="password" 
-                    name="password" 
-                    placeholder="Create a password (min 6 characters)" 
-                    (blur)="validatePassword()"
-                    (input)="validatePassword()"
-                    required
-                    minlength="6">
-                  <button type="button" class="input-group-text" style="background: var(--dark-bg); border-color: var(--border-color); color: var(--text-secondary); cursor: pointer;" (click)="showPassword = !showPassword">
+                  <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control-dark"
+                    [class.is-invalid]="passwordError" [class.is-valid]="password && !passwordError"
+                    [(ngModel)]="password" name="password" placeholder="Create a password (min 6 characters)"
+                    (blur)="validatePassword()" (input)="validatePassword()" required minlength="6">
+                  <button type="button" class="input-group-text"
+                    style="background: var(--dark-bg); border-color: var(--border-color); color: var(--text-secondary); cursor: pointer;"
+                    (click)="showPassword = !showPassword">
                     <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                   </button>
                 </div>
                 @if (passwordError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ passwordError }}
-                  </div>
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ passwordError }}
+                </div>
                 }
                 @if (password && !passwordError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Password strength: {{ getPasswordStrength() }}
-                  </div>
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Password strength: {{ getPasswordStrength() }}
+                </div>
                 }
                 @if (password && password.length > 0) {
-                  <div class="mt-2">
-                    <div class="progress" style="height: 5px; background: var(--dark-bg);">
-                      <div class="progress-bar" [class]="getPasswordStrengthClass()" [style.width.%]="getPasswordStrengthPercent()"></div>
-                    </div>
+                <div class="mt-2">
+                  <div class="progress" style="height: 5px; background: var(--dark-bg);">
+                    <div class="progress-bar" [class]="getPasswordStrengthClass()"
+                      [style.width.%]="getPasswordStrengthPercent()"></div>
                   </div>
+                </div>
                 }
               </div>
               <div class="mb-4">
@@ -117,13 +98,14 @@
               </div>
               <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading || !isFormValid()">
                 @if (loading) {
-                  <span class="spinner-border spinner-border-sm me-2"></span>
+                <span class="spinner-border spinner-border-sm me-2"></span>
                 }
                 Create Account
               </button>
             </form>
             <p class="text-center text-secondary mb-0">
-              Already have an account? <a routerLink="/login" class="text-decoration-none" style="color: #667eea;">Sign In</a>
+              Already have an account? <a routerLink="/login" class="text-decoration-none" style="color: #667eea;">Sign
+                In</a>
             </p>
           </div>
         </div>
