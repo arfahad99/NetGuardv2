@@ -16,10 +16,12 @@ auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 Registerd_users = globals.db.Registerd_users
 blacklist = globals.db.BlackList
 
-# Cognito Setup
-COGNITO_CLIENT_ID = os.getenv("COGNITO_CLIENT_ID")
-cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1')) if COGNITO_CLIENT_ID else None
-
+# Cognito Setup (Initialized on demand)
+def get_cognito_config():
+    client_id = os.getenv("COGNITO_CLIENT_ID")
+    if client_id:
+        client_id = client_id.strip('"').strip("'")  # Strip accidental quotes from bash injections
+    return client_id
 
 # --------------Signup Code Start---------------
 
@@ -71,11 +73,13 @@ def Signup():
         )
 
     # 1. Amazon Cognito Integration (If configured)
-    if COGNITO_CLIENT_ID and cognito_client:
+    cognito_client_id = get_cognito_config()
+    if cognito_client_id:
         try:
+            cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1'))
             # We use the email as the Cognito username usually, but we can pass attributes
             resp = cognito_client.sign_up(
-                ClientId=COGNITO_CLIENT_ID,
+                ClientId=cognito_client_id,
                 Username=username,
                 Password=password,
                 UserAttributes=[
@@ -96,6 +100,8 @@ def Signup():
             
         except ClientError as e:
             return make_response(jsonify({"error": e.response['Error']['Message']}), 400)
+        except Exception as e:
+            return make_response(jsonify({"error": f"Cognito Initialization Failed: {str(e)}"}), 500)
 
     # 2. Local Database Fallback (If Cognito not configured)
 
@@ -161,12 +167,15 @@ def ResendCode():
     if not username:
         return make_response(jsonify({"error": "Username required"}), 400)
 
-    if not COGNITO_CLIENT_ID or not cognito_client:
+    cognito_client_id = get_cognito_config()
+    if not cognito_client_id:
         return make_response(jsonify({"error": "Cognito not configured"}), 400)
+
+    cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1'))
 
     try:
         cognito_client.resend_confirmation_code(
-            ClientId=COGNITO_CLIENT_ID,
+            ClientId=cognito_client_id,
             Username=username
         )
         return make_response(jsonify({"message": "Verification code resent."}), 200)
