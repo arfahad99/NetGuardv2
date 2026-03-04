@@ -88,6 +88,10 @@ def Signup():
             user_attributes = []
             if email:
                 user_attributes.append({'Name': 'email', 'Value': email})
+            else:
+                # AWS Cognito might require an email attribute strictly in this User Pool.
+                user_attributes.append({'Name': 'email', 'Value': f"{username}@placeholder.netguard"})
+
             if phone:
                 user_attributes.append({'Name': 'phone_number', 'Value': phone})
                 
