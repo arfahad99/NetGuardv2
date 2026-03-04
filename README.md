@@ -604,6 +604,7 @@ Comprehensive monitoring dashboard:
 ## 🚧 Future Improvements
 
 ### Short-term
+- [ ] Connect Devices, QoS Events, and Sessions pages to live network monitoring tools (currently using placeholder/demo data for future development)
 - [ ] Real-time updates with WebSockets
 - [ ] Advanced filtering with date ranges
 - [ ] Export data to CSV/Excel
