@@ -139,13 +139,15 @@ def Verify():
     if not username or not code:
         return make_response(jsonify({"error": "Username and verification code required"}), 400)
 
-    if not COGNITO_CLIENT_ID or not cognito_client:
-        # If Cognito is disabled, auto-verify for dev
-        return make_response(jsonify({"message": "Local dev: auto-verified"}), 200)
+    cognito_client_id = get_cognito_config()
+    if not cognito_client_id:
+        return make_response(jsonify({"error": "Cognito not configured"}), 400)
+
+    cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1'))
 
     try:
         cognito_client.confirm_sign_up(
-            ClientId=COGNITO_CLIENT_ID,
+            ClientId=cognito_client_id,
             Username=username,
             ConfirmationCode=code
         )
