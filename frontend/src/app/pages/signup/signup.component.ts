@@ -87,6 +87,12 @@ export class SignupComponent {
       this.passwordError = 'Password is required';
     } else if (this.password.length < 6) {
       this.passwordError = 'Password must be at least 6 characters';
+    } else if (!/[A-Z]/.test(this.password)) {
+      this.passwordError = 'Password must include at least one uppercase letter';
+    } else if (!/[0-9]/.test(this.password)) {
+      this.passwordError = 'Password must include at least one number';
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.password)) {
+      this.passwordError = 'Password must include at least one special character';
     } else {
       this.passwordError = '';
     }

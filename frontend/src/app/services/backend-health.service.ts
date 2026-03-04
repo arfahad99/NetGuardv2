@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, timer, of } from 'rxjs';
+import { BehaviorSubject, Observable, timer, of, Subscription } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -13,7 +13,7 @@ export class BackendHealthService {
   private lastCheckTime = 0;
   private checkInterval = 5000; // Check every 5 seconds
   private isChecking = false;
-  private destroyed = false;
+  private subscription?: Subscription;
 
   public backendStatus$ = this.backendStatusSubject.asObservable();
 
@@ -25,7 +25,9 @@ export class BackendHealthService {
    * Clean up resources when service is destroyed
    */
   ngOnDestroy(): void {
-    this.destroyed = true;
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
     this.backendStatusSubject.complete();
   }
 
@@ -33,7 +35,7 @@ export class BackendHealthService {
    * Start continuous health checking
    */
   private startHealthCheck(): void {
-    timer(0, this.checkInterval).pipe(
+    this.subscription = timer(0, this.checkInterval).pipe(
       switchMap(() => this.checkBackendHealth())
     ).subscribe();
   }
@@ -49,7 +51,7 @@ export class BackendHealthService {
     this.isChecking = true;
     this.lastCheckTime = Date.now();
 
-    return this.http.get(this.healthCheckUrl, { 
+    return this.http.get(this.healthCheckUrl, {
       timeout: 3000,
       observe: 'response'
     }).pipe(
@@ -74,7 +76,7 @@ export class BackendHealthService {
   private updateBackendStatus(isHealthy: boolean): void {
     if (this.backendStatusSubject.value !== isHealthy) {
       this.backendStatusSubject.next(isHealthy);
-      
+
       if (isHealthy) {
         console.log('✅ Backend is now available');
       } else {

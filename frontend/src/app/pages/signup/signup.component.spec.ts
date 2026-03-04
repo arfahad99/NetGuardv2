@@ -89,7 +89,7 @@ describe('SignupComponent', () => {
     expect(component.passwordError).toBe('Password must be at least 6 characters');
 
     // Valid password
-    component.password = 'validpass123';
+    component.password = 'Validpass123!';
     component.validatePassword();
     expect(component.passwordError).toBe('');
   });
@@ -140,7 +140,7 @@ describe('SignupComponent', () => {
     // Valid form
     component.username = 'testuser';
     component.email = 'test@example.com';
-    component.password = 'password123';
+    component.password = 'Password123!';
     component.usernameError = '';
     component.emailError = '';
     component.passwordError = '';
@@ -161,7 +161,7 @@ describe('SignupComponent', () => {
   it('should handle successful signup', () => {
     component.username = 'testuser';
     component.email = 'test@example.com';
-    component.password = 'password123';
+    component.password = 'Password123!';
     component.usernameError = '';
     component.emailError = '';
     component.passwordError = '';
@@ -170,7 +170,7 @@ describe('SignupComponent', () => {
 
     component.onSignup();
 
-    expect(authSpy.signup).toHaveBeenCalledWith('testuser', 'test@example.com', 'password123', '');
+    expect(authSpy.signup).toHaveBeenCalledWith('testuser', 'test@example.com', 'Password123!', '');
     expect(toastSpy.success).toHaveBeenCalledWith('Account created successfully! Please sign in.');
     expect(router.navigate).toHaveBeenCalledWith(['/signin']);
   });
@@ -178,7 +178,7 @@ describe('SignupComponent', () => {
   it('should handle signup error', () => {
     component.username = 'testuser';
     component.email = 'test@example.com';
-    component.password = 'password123';
+    component.password = 'Password123!';
     component.usernameError = '';
     component.emailError = '';
     component.passwordError = '';
@@ -196,7 +196,7 @@ describe('SignupComponent', () => {
   it('should handle signup error without specific message', () => {
     component.username = 'testuser';
     component.email = 'test@example.com';
-    component.password = 'password123';
+    component.password = 'Password123!';
     component.usernameError = '';
     component.emailError = '';
     component.passwordError = '';
@@ -223,7 +223,7 @@ describe('SignupComponent', () => {
   it('should set loading state during signup', () => {
     component.username = 'testuser';
     component.email = 'test@example.com';
-    component.password = 'password123';
+    component.password = 'Password123!';
     component.usernameError = '';
     component.emailError = '';
     component.passwordError = '';

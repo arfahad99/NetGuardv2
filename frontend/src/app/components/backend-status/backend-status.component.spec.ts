@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
 import { BackendStatusComponent } from './backend-status.component';
 import { BackendHealthService } from '../../services/backend-health.service';
+import { environment } from '../../../environments/environment';
 
 describe('BackendStatusComponent', () => {
   let component: BackendStatusComponent;
@@ -47,11 +48,11 @@ describe('BackendStatusComponent', () => {
   it('should initialize with correct default values', () => {
     expect(component.isRetrying).toBe(false);
     expect(component.showInstructions).toBe(false);
-    expect(component.serverUrl).toBe('http://127.0.0.1:5001');
+    expect(component.serverUrl).toBe(environment.apiUrl);
   });
 
   it('should set server URL on initialization', () => {
-    expect(component.serverUrl).toBe('http://127.0.0.1:5001');
+    expect(component.serverUrl).toBe(environment.apiUrl);
   });
 
   it('should update backend status when service emits', () => {

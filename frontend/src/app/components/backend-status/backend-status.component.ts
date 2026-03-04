@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { BackendHealthService } from '../../services/backend-health.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-backend-status',
@@ -16,11 +17,11 @@ export class BackendStatusComponent implements OnInit, OnDestroy {
   showInstructions = false;
   lastCheckTime = new Date();
   serverUrl = '';
-  
+
   private subscription?: Subscription;
 
   constructor(private backendHealth: BackendHealthService) {
-    this.serverUrl = 'http://127.0.0.1:5001'; // From environment
+    this.serverUrl = environment.apiUrl; // Dynamically pull from environment
   }
 
   ngOnInit() {
