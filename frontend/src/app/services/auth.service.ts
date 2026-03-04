@@ -52,8 +52,8 @@ export class AuthService {
     );
   }
 
-  signup(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/Signup`, { username, email, password });
+  signup(username: string, email: string, password: string, phone: string = ''): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/Signup`, { username, email, password, phone });
   }
 
   verifyEmail(username: string, code: string): Observable<any> {

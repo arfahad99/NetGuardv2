@@ -20,9 +20,12 @@ export class SignupComponent {
 
   usernameError = '';
   emailError = '';
+  phoneError = '';
   passwordError = '';
   serverError = '';
 
+  verificationMethod: 'email' | 'phone' = 'email';
+  phone = '';
   awaitingVerification = false;
   verificationCode = '';
   verificationError = '';
@@ -50,19 +53,31 @@ export class SignupComponent {
   }
 
   validateEmail() {
-    // Clear server error when user starts typing
     if (this.emailError && this.emailError.includes('already')) {
       this.emailError = '';
     }
-
     if (!this.email) {
       this.emailError = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
       this.emailError = 'Please enter a valid email address';
     } else {
-      // Only clear client-side validation errors, keep server errors
       if (!this.emailError.includes('already')) {
         this.emailError = '';
+      }
+    }
+  }
+
+  validatePhone() {
+    if (this.phoneError && this.phoneError.includes('already')) {
+      this.phoneError = '';
+    }
+    if (!this.phone) {
+      this.phoneError = 'Phone number is required';
+    } else if (!/^\+[1-9]\d{1,14}$/.test(this.phone)) {
+      this.phoneError = 'Please enter a valid phone number with country code (e.g. +1234567890)';
+    } else {
+      if (!this.phoneError.includes('already')) {
+        this.phoneError = '';
       }
     }
   }
@@ -106,31 +121,31 @@ export class SignupComponent {
   }
 
   isFormValid(): boolean {
-    // Check if all fields are filled and no client-side validation errors
-    const hasRequiredFields = !!(this.username && this.email && this.password);
+    const hasRequiredFields = !!(this.username && this.password && (this.verificationMethod === 'email' ? this.email : this.phone));
     const hasNoClientErrors = !this.hasClientValidationErrors();
 
     return hasRequiredFields && hasNoClientErrors;
   }
 
   private hasClientValidationErrors(): boolean {
-    // Only check for client-side validation errors, not server-side "already exists" errors
     const usernameClientError = this.usernameError && !this.usernameError.includes('already exists');
-    const emailClientError = this.emailError && !this.emailError.includes('already');
+    const authMethodClientError = this.verificationMethod === 'email'
+      ? this.emailError && !this.emailError.includes('already')
+      : this.phoneError && !this.phoneError.includes('already');
     const passwordClientError = !!this.passwordError;
 
-    return !!(usernameClientError || emailClientError || passwordClientError);
+    return !!(usernameClientError || authMethodClientError || passwordClientError);
   }
 
   hasServerErrors(): boolean {
     const usernameServerError = this.usernameError && this.usernameError.includes('already exists');
     const emailServerError = this.emailError && this.emailError.includes('already');
+    const phoneServerError = this.phoneError && this.phoneError.includes('already');
 
-    return !!(usernameServerError || emailServerError);
+    return !!(usernameServerError || emailServerError || phoneServerError);
   }
 
   onUsernameInput() {
-    // Clear server error immediately when user starts typing
     if (this.usernameError && this.usernameError.includes('already exists')) {
       this.usernameError = '';
     }
@@ -138,20 +153,37 @@ export class SignupComponent {
   }
 
   onEmailInput() {
-    // Clear server error immediately when user starts typing
     if (this.emailError && this.emailError.includes('already')) {
       this.emailError = '';
     }
     this.validateEmail();
   }
 
+  onPhoneInput() {
+    if (this.phoneError && this.phoneError.includes('already')) {
+      this.phoneError = '';
+    }
+    this.validatePhone();
+  }
+
+  onMethodChange() {
+    this.emailError = '';
+    this.phoneError = '';
+    if (this.verificationMethod === 'email') {
+      this.phone = '';
+    } else {
+      this.email = '';
+    }
+  }
+
   onSignup() {
-    // Clear previous server errors
     this.serverError = '';
     this.clearServerFieldErrors();
 
     this.validateUsername();
-    this.validateEmail();
+    if (this.verificationMethod === 'email') this.validateEmail();
+    else this.validatePhone();
+
     this.validatePassword();
 
     if (!this.isFormValid()) {
@@ -160,10 +192,11 @@ export class SignupComponent {
     }
 
     this.loading = true;
-    this.authService.signup(this.username, this.email, this.password).subscribe({
+    this.authService.signup(this.username, this.email, this.password, this.phone).subscribe({
       next: (res: any) => {
         if (res.requires_verification) {
-          this.toast.info('Please check your email for a verification code.');
+          const destination = this.verificationMethod === 'email' ? 'email' : 'phone';
+          this.toast.info(`Please check your ${destination} for a verification code.`);
           this.awaitingVerification = true;
           this.loading = false;
         } else {
@@ -204,12 +237,14 @@ export class SignupComponent {
   }
 
   private clearServerFieldErrors() {
-    // Only clear server-side errors, keep client-side validation errors
     if (this.usernameError && this.usernameError.includes('already exists')) {
       this.usernameError = '';
     }
-    if (this.emailError && this.emailError.includes('already exists')) {
+    if (this.emailError && this.emailError.includes('already')) {
       this.emailError = '';
+    }
+    if (this.phoneError && this.phoneError.includes('already')) {
+      this.phoneError = '';
     }
   }
 
@@ -225,6 +260,10 @@ export class SignupComponent {
 
     if (conflicts.includes('email')) {
       this.emailError = 'This email is already registered. Please use a different email.';
+    }
+
+    if (conflicts.includes('phone')) {
+      this.phoneError = 'This phone number is already registered.';
     }
 
     // Set general server error for toast

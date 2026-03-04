@@ -36,12 +36,13 @@ def Signup():
 
     username = (data.get("username") or "").strip()
     email = (data.get("email") or "").strip().lower()
+    phone = (data.get("phone") or "").strip()
     password = data.get("password")  # required
 
-    # Need username OR email, and password
-    if (not username and not email) or not password:
+    # Need username, password, and either email or phone
+    if not username or not password or (not email and not phone):
         return make_response(
-            jsonify({"error": "username or email, and password required"}), 400
+            jsonify({"error": "username, password, and either email or phone are required"}), 400
         )
 
     # Uniqueness check for username and email separately
@@ -56,14 +57,21 @@ def Signup():
         existing_email = globals.Registerd_users.find_one({"email": email})
         if existing_email:
             existing_conflicts.append("email")
+            
+    if phone:
+        existing_phone = globals.Registerd_users.find_one({"phone": phone})
+        if existing_phone:
+            existing_conflicts.append("phone")
     
     if existing_conflicts:
-        if len(existing_conflicts) == 2:
-            error_message = "Both username and email already exist"
+        if len(existing_conflicts) > 1:
+            error_message = f"Multiple fields already in use: {', '.join(existing_conflicts)}"
         elif "username" in existing_conflicts:
             error_message = "Username already exists"
-        else:
+        elif "email" in existing_conflicts:
             error_message = "Email already exists"
+        else:
+            error_message = "Phone number already exists"
         
         return make_response(
             jsonify({
@@ -77,23 +85,28 @@ def Signup():
     if cognito_client_id:
         try:
             cognito_client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1'))
-            # We use the email as the Cognito username usually, but we can pass attributes
+            user_attributes = []
+            if email:
+                user_attributes.append({'Name': 'email', 'Value': email})
+            if phone:
+                user_attributes.append({'Name': 'phone_number', 'Value': phone})
+                
             resp = cognito_client.sign_up(
                 ClientId=cognito_client_id,
                 Username=username,
                 Password=password,
-                UserAttributes=[
-                    {'Name': 'email', 'Value': email}
-                ]
+                UserAttributes=user_attributes
             )
             
             # Still store in local database to map roles/admin
             hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-            doc = {"password": hashed, "username": username, "email": email, "admin": False, "verified": False}
+            doc = {"password": hashed, "username": username, "admin": False, "verified": False}
+            if email: doc["email"] = email
+            if phone: doc["phone"] = phone
             result = globals.Registerd_users.insert_one(doc)
 
             return make_response(jsonify({
-                "message": "Signup successful. Please verify your email.",
+                "message": "Signup successful. Please verify your account.",
                 "requires_verification": True,
                 "user_id": str(result.inserted_id)
             }), 201)
@@ -108,10 +121,9 @@ def Signup():
     # Hash and store user
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     doc = {"password": hashed}
-    if username:
-        doc["username"] = username
-    if email:
-        doc["email"] = email
+    if username: doc["username"] = username
+    if email: doc["email"] = email
+    if phone: doc["phone"] = phone
     # Ensure every user document has an explicit admin flag (default: False)
     doc["admin"] = False
 
