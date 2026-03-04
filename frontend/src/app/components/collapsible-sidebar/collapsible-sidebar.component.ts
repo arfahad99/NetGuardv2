@@ -144,7 +144,7 @@ export class CollapsibleSidebarComponent implements OnInit, OnDestroy, OnChanges
       { route: '/dashboard', icon: 'bi-grid-1x2-fill', label: 'Dashboard' },
       { route: '/devices', icon: 'bi-pc-display', label: 'Devices' },
       { route: '/alerts', icon: 'bi-bell-fill', label: 'Alerts' },
-      { route: '/network-health', icon: 'bi-activity', label: 'Measurements' },
+      { route: '/network-health', icon: 'bi-activity', label: 'Network Health' },
       { route: '/qos-events', icon: 'bi-speedometer2', label: 'QoS Events' },
       { route: '/sessions', icon: 'bi-clock-history', label: 'Sessions' },
       { route: '/cloud-health', icon: 'bi-cloud-check-fill', label: 'Cloud Health' }
