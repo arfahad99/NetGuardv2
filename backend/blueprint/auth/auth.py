@@ -112,7 +112,8 @@ def Signup():
             return make_response(jsonify({
                 "message": "Signup successful. Please verify your account.",
                 "requires_verification": True,
-                "user_id": str(result.inserted_id)
+                "user_id": str(result.inserted_id),
+                "delivery_details": resp.get('CodeDeliveryDetails')
             }), 201)
             
         except ClientError as e:
