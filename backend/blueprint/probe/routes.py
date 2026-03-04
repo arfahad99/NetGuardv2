@@ -1,3 +1,7 @@
+"""
+Probe routes blueprint.
+Receives measurement data securely from probe instances and provides historical logs.
+"""
 from flask import Blueprint, request, jsonify
 from globals import measurements_table
 from boto3.dynamodb.conditions import Key
@@ -36,18 +40,44 @@ def submit():
             return jsonify({'error': f'Missing field: {field}'}), 400
 
     # Threshold evaluation
-    alert = (
-        data['latencyMs']    > float(os.getenv('LATENCY_THRESHOLD_MS',   100)) or
-        data['packetLoss']   > float(os.getenv('PACKETLOSS_THRESHOLD_PCT', 1.0)) or
-        data['downloadMbps'] < float(os.getenv('BANDWIDTH_THRESHOLD_MBPS', 10))
-    )
-    data['alertFlag'] = alert
+    alert_reasons = []
+    if data['latencyMs'] > float(os.getenv('LATENCY_THRESHOLD_MS', 100)):
+        alert_reasons.append(f"High Latency ({data['latencyMs']}ms)")
+    if data['packetLoss'] > float(os.getenv('PACKETLOSS_THRESHOLD_PCT', 1.0)):
+        alert_reasons.append(f"Packet Loss ({data['packetLoss']}%)")
+    if data['downloadMbps'] < float(os.getenv('BANDWIDTH_THRESHOLD_MBPS', 10)):
+        alert_reasons.append(f"Low Bandwidth ({data['downloadMbps']}Mbps)")
+
+    alert_flag = len(alert_reasons) > 0
+    data['alertFlag'] = alert_flag
 
     # Store in DynamoDB (floats must be Decimal)
     item = to_decimal(data)
     measurements_table.put_item(Item=item)
 
-    return jsonify({'status': 'success', 'alert': alert}), 201
+    if alert_flag:
+        from globals import db
+        import time
+        new_alert = {
+            "type": "Network Performance Issue",
+            "severity": "critical",
+            "message": f"Threshold exceeded: {', '.join(alert_reasons)}",
+            "status": "active",
+            "device": {
+                "device_id": data.get('deviceId', 'probe'),
+                "interface": "wan",
+            },
+            "timestamps": {"created_at": int(time.time()), "resolved_at": None},
+            "ack": {"acknowledged": False, "by": None, "at": None},
+            "source": {
+                "rule_id": "probe_threshold",
+                "detector": data.get('deviceId', 'probe'),
+            },
+            "labels": ["probe", "auto", "network"],
+        }
+        db.alerts.insert_one(new_alert)
+
+    return jsonify({'status': 'success', 'alert': alert_flag}), 201
 
 # ── GET /probe/latest/<deviceId> ────────────────────────────────
 @probe_bp.route('/latest/<device_id>', methods=['GET'])

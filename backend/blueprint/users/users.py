@@ -1,3 +1,7 @@
+"""
+Users blueprint for administrative user management.
+Allows Admins to view, create, edit, and delete registered platform accounts.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, admin_required
 import bcrypt

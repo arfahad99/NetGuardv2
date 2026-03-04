@@ -1,3 +1,7 @@
+"""
+Sessions blueprint for tracking connection metadata.
+Manages user network sessions, geo-locations, and timeline data.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, role_required
 

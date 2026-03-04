@@ -1,28 +1,33 @@
 .graph-container {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s ease;
+  padding: 20px 20px 10px 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .graph-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .graph-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .graph-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #fff;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .graph-legend {
@@ -32,94 +37,29 @@
 }
 
 .legend-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   display: inline-block;
 }
 
 .legend-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 .graph-wrapper {
   position: relative;
   width: 100%;
-  margin-bottom: 15px;
-  padding-left: 45px; /* Space for Y-axis labels */
 }
 
-.graph-svg {
-  width: 100%;
-  display: block;
-  border-radius: 8px;
-}
-
-.grid-line {
-  stroke-dasharray: 2, 2;
-}
-
-.graph-area {
-  transition: opacity 0.3s ease;
-}
-
-.graph-line {
-  transition: stroke-dashoffset 1.5s ease-out;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.graph-point {
-  transition: opacity 0.3s ease;
-  cursor: pointer;
-  animation: point-appear 0.5s ease-out forwards;
-}
-
-@keyframes point-appear {
-  0% {
-    r: 0;
-    opacity: 0;
-  }
-  50% {
-    r: 1.2;
-  }
-  100% {
-    r: 0.8;
-    opacity: 1;
-  }
-}
-
-.graph-point:hover {
-  r: 1.5;
-  filter: drop-shadow(0 0 4px currentColor);
-}
-
-/* Y-axis labels */
-.y-axis-labels {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  pointer-events: none;
-}
-
-.y-label {
-  position: absolute;
-  right: 0;
-  transform: translateY(50%);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-align: right;
-}
-
-/* Stats */
+/* Base Stats */
 .graph-stats {
   display: flex;
   justify-content: space-around;
   padding-top: 15px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .stat-item {
@@ -131,57 +71,55 @@
 
 .stat-label {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .stat-value {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 700;
 }
 
-/* Dark mode enhancements */
-body.dark-mode .graph-container {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+/* Custom ApexChart Dark Mode Overrides */
+::ng-deep .apexcharts-tooltip {
+  background: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
 }
 
-body.dark-mode .graph-container:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+::ng-deep .apexcharts-tooltip-title {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 600 !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
 }
 
-body.dark-mode .graph-line {
-  filter: drop-shadow(0 0 4px currentColor);
+::ng-deep .apexcharts-text {
+  fill: #9ca3af !important;
+  font-family: inherit !important;
 }
 
-/* Light mode enhancements */
-body.light-mode .graph-container {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+::ng-deep .apexcharts-zoom-icon,
+::ng-deep .apexcharts-pan-icon,
+::ng-deep .apexcharts-reset-icon,
+::ng-deep .apexcharts-menu-icon {
+  fill: #9ca3af !important;
 }
 
-body.light-mode .graph-container:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+::ng-deep .apexcharts-gridline {
+  stroke: rgba(255, 255, 255, 0.05);
 }
 
-/* Responsive */
+/* Responsive Styles */
 @media (max-width: 768px) {
   .graph-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .graph-wrapper {
-    padding-left: 35px;
-  }
-  
-  .y-axis-labels {
-    width: 30px;
-  }
-  
-  .y-label {
-    font-size: 0.625rem;
+    gap: 8px;
   }
 }

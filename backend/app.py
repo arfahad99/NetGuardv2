@@ -1,6 +1,11 @@
+"""
+Main Flask application entry point for NetGuardV2 backend.
+Initializes the Flask app, configures CORS, and registers all workflow routing blueprints.
+"""
 from flask import Flask, jsonify
 from flask_cors import CORS
-# blueprints
+
+# Import route blueprints
 from blueprint.auth.auth import auth_bp
 from blueprint.qosevent.qosevent import qos_events_bp
 from blueprint.alerts.alerts import alerts_bp
@@ -10,7 +15,7 @@ from blueprint.Network_health.Networks_health import network_health_bp
 from blueprint.users.users import users_bp
 from blueprint.probe.routes import probe_bp
 
-
+# Initialize Flask application
 app = Flask(__name__)
 # Enable CORS for Angular frontend (allow common development ports)
 CORS(
@@ -51,20 +56,6 @@ def health_check():
         'timestamp': app.config.get('start_time', 'unknown')
     }), 200
 
-import os
-@app.route("/diagnostic-config", methods=["GET"])
-def diagnostic_config():
-    try:
-        with open("/etc/nginx/sites-available/default", "r") as f:
-            default_conf = f.read()
-    except Exception as e:
-        default_conf = str(e)
-    try:
-        with open("/etc/nginx/sites-available/netguard", "r") as f:
-            netguard_conf = f.read()
-    except Exception as e:
-        netguard_conf = str(e)
-    return jsonify({ "default": default_conf, "netguard": netguard_conf }), 200
 
 if __name__ == "__main__":
     import time

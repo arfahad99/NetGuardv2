@@ -1,3 +1,7 @@
+"""
+Devices blueprint for managing network devices.
+Supports pagination, retrieval, creation, updating, and deletion of devices.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, role_required
 

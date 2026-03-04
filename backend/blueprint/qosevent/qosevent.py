@@ -1,3 +1,7 @@
+"""
+QoS Events blueprint managing Quality of Service events.
+Used to track bandwidth allocation, latency, and signal strength for applications.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, role_required
 

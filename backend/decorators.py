@@ -1,3 +1,7 @@
+"""
+Authentication and Authorization decorators.
+Provides @jwt_required, @role_required, and @admin_required decorators to protect routes.
+"""
 from functools import wraps
 from flask import jsonify, request, make_response
 import jwt

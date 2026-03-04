@@ -21,11 +21,8 @@ export class AuthService {
     const basicAuth = 'Basic ' + btoa(username + ':' + password);
     const headers = { 'Authorization': basicAuth };
 
-    console.log('Login attempt:', { url: `${this.apiUrl}/auth/Signin`, username });
-
     return this.http.post(`${this.apiUrl}/auth/Signin`, {}, { headers }).pipe(
       tap((response: any) => {
-        console.log('Login response:', response);
         if (response.token) {
           this.setToken(response.token);
           const user = {
@@ -40,13 +37,7 @@ export class AuthService {
       }),
       tap({
         error: (error) => {
-          console.error('Login error:', error);
-          console.error('Error details:', {
-            status: error.status,
-            statusText: error.statusText,
-            message: error.message,
-            error: error.error
-          });
+          // Keep silent or handle errors without exposing details to console in production
         }
       })
     );
@@ -154,7 +145,6 @@ export class AuthService {
   guestLogin(): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/GuestLogin`, {}).pipe(
       tap((response: any) => {
-        console.log('Guest login response:', response);
         if (response.token) {
           this.setToken(response.token);
           const user = {
@@ -169,7 +159,7 @@ export class AuthService {
       }),
       tap({
         error: (error) => {
-          console.error('Guest login error:', error);
+          // Handle error silently
         }
       })
     );

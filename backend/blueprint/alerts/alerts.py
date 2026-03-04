@@ -1,3 +1,7 @@
+"""
+Alerts blueprint for handling system and network alerts.
+Provides endpoints for creating, acknowledging, and managing alert states.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, role_required
 

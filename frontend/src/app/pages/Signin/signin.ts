@@ -41,9 +41,6 @@ export class SigninComponent {
   passwordError = '';
   loginAttempts = 0;
 
-  // Auth token (for potential logout functionality)
-  token: string | null = null;
-
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -101,11 +98,6 @@ export class SigninComponent {
     return new Promise<void>((resolve, reject) => {
       this.authService.signin(this.username, this.password).subscribe({
         next: (res) => {
-          // Store token if returned
-          if (res.token) {
-            this.token = res.token;
-          }
-
           // Handle remember me
           if (this.rememberMe) {
             localStorage.setItem('rememberedUsername', this.username);
@@ -173,25 +165,6 @@ export class SigninComponent {
       error: () => {
         this.loading = false;
         this.toast.error('Guest sign in failed. Please try again.');
-      }
-    });
-  }
-
-  /**
-   * Logs out the current user (if token exists)
-   */
-  onLogout() {
-    if (!this.token) return;
-
-    this.authService.signout().subscribe({
-      next: () => {
-        this.authService.clearLoginState();
-        this.token = null;
-        this.toast.success('Logged out successfully');
-        this.router.navigate(['/signin']);
-      },
-      error: () => {
-        this.toast.error('Logout failed');
       }
     });
   }

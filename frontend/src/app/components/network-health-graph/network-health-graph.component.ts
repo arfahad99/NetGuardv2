@@ -1,111 +1,184 @@
-import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  ChartComponent,
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexDataLabels,
+  ApexStroke,
+  ApexYAxis,
+  ApexTitleSubtitle,
+  ApexLegend,
+  ApexFill,
+  NgApexchartsModule,
+  ApexTooltip,
+  ApexGrid
+} from 'ng-apexcharts';
 
-/**
- * Interface representing network health data structure
- * Contains metrics and context information for network monitoring
- */
-interface NetworkHealthData {
-  metrics?: {
-    bandwidth?: {
-      upload_mbps?: number;
-      download_mbps?: number;
-    };
-    latency_ms?: number;
-    packet_loss_percent?: number;
-    uptime_percent?: number;
-  };
-  context?: {
-    site?: string;
-    interface?: string;
-  };
-}
+export type ChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  stroke: ApexStroke;
+  dataLabels: ApexDataLabels;
+  yaxis: ApexYAxis;
+  title: ApexTitleSubtitle;
+  labels: string[];
+  legend: ApexLegend;
+  subtitle: ApexTitleSubtitle;
+  fill: ApexFill;
+  tooltip: ApexTooltip;
+  colors: string[];
+  grid: ApexGrid;
+};
 
-/**
- * Interface representing a point on the graph
- * x: horizontal position (0-100%)
- * y: actual metric value
- */
-interface GraphPoint {
-  x: number;
-  y: number;
-  timeLabel: string;
-  originalRecord?: any;
-}
-
-/**
- * Network Health Graph Component
- * 
- * Displays animated SVG-based graphs for network health metrics including:
- * - Bandwidth (upload + download)
- * - Latency
- * - Packet Loss
- * - Uptime
- * 
- * Features:
- * - Smooth bezier curve animations
- * - Gradient fills
- * - Interactive data points
- * - Auto-scaling Y-axis
- * - Responsive design
- */
 @Component({
   selector: 'app-network-health-graph',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, NgApexchartsModule],
   templateUrl: './network-health-graph.component.html',
   styleUrls: ['./network-health-graph.component.css']
 })
 export class NetworkHealthGraphComponent implements OnInit, OnChanges {
-  /** Array of network health data to display */
   @Input() data: any[] = [];
-
-  /** Type of metric to display */
   @Input() metric: 'bandwidth' | 'latency' | 'packet_loss' | 'uptime' = 'bandwidth';
-
-  /** Height of the graph in pixels */
   @Input() height: number = 300;
 
-  graphPoints: GraphPoint[] = [];
-  maxValue: number = 100;
-  minValue: number = 0;
-  pathData: string = '';
-  areaPathData: string = '';
-  gridLines: number[] = [0, 25, 50, 75, 100];
-  animationProgress: number = 0;
-  selectedPoint: GraphPoint | null = null;
-  Math = Math;
+  @ViewChild('chart') chart!: ChartComponent;
+  public chartOptions: Partial<ChartOptions> | any;
 
-  showDetails(point: GraphPoint) {
-    this.selectedPoint = point;
+  // Stats for the side
+  maxValue: number = 0;
+  minValue: number = 0;
+  pointsCount: number = 0;
+
+  constructor() {
+    this.initChart();
   }
 
   ngOnInit() {
-    this.updateGraph();
+    if (this.data && this.data.length > 0) {
+      this.updateGraph();
+    } else {
+      this.generateDemoData();
+    }
   }
 
   ngOnChanges() {
-    this.updateGraph();
-  }
-
-  /**
-   * Main update method that orchestrates graph rendering
-   * Generates demo data if no real data is available
-   */
-  updateGraph() {
-    if (!this.data || this.data.length === 0) {
+    if (this.data && this.data.length > 0) {
+      this.updateGraph();
+    } else {
       this.generateDemoData();
-      return;
     }
-
-    this.extractDataPoints();
-    this.calculateBounds();
-    this.generatePath();
-    this.animatePath();
   }
 
-  /**
-   * Generates demo data when no real data is available
-   */
+  initChart() {
+    const color = this.getMetricColor();
+
+    this.chartOptions = {
+      series: [
+        {
+          name: this.getMetricLabel(),
+          data: []
+        }
+      ],
+      chart: {
+        type: 'area',
+        height: this.height,
+        background: 'transparent',
+        fontFamily: 'inherit',
+        toolbar: {
+          show: false // Hide menu bars for a cleaner widget look
+        },
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 350
+          }
+        }
+      },
+      colors: [color], // Dynamic color
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.45,
+          opacityTo: 0.05,
+          stops: [0, 90, 100]
+        }
+      },
+      dataLabels: {
+        enabled: false // Disable direct text dots inside the chart for a minimalistic feel
+      },
+      stroke: {
+        curve: 'smooth', // Smooth out the area path curves perfectly
+        width: 3
+      },
+      xaxis: {
+        type: 'category',
+        categories: [],
+        labels: {
+          style: {
+            colors: '#9ca3af',
+            fontSize: '11px'
+          }
+        },
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      },
+      yaxis: {
+        labels: {
+          formatter: (value: number) => {
+            return value.toFixed(1);
+          },
+          style: {
+            colors: '#9ca3af',
+            fontSize: '11px'
+          }
+        }
+      },
+      grid: {
+        borderColor: 'rgba(255,255,255,0.05)',
+        strokeDashArray: 4,
+        yaxis: {
+          lines: {
+            show: true
+          }
+        },
+        xaxis: {
+          lines: {
+            show: false
+          }
+        }
+      },
+      tooltip: {
+        theme: 'dark',
+        y: {
+          formatter: (val: number) => val.toFixed(2)
+        }
+      }
+    };
+  }
+
+  updateGraph() {
+    this.extractDataPoints();
+  }
+
   generateDemoData() {
     const ranges = {
       bandwidth: { min: 50, max: 100 },
@@ -119,30 +192,23 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
       const d = new Date();
       d.setMinutes(d.getMinutes() - (19 - index) * 5);
       return {
-        y: range.min + Math.random() * (range.max - range.min),
+        y: Math.random() * (range.max - range.min) + range.min,
         timeLabel: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
     });
 
-    this.graphPoints = demoData.map((data, index) => ({
-      x: (index / 19) * 100,
-      y: data.y,
-      timeLabel: data.timeLabel,
-      originalRecord: { simulated: true }
-    }));
-
-    this.calculateBounds();
-    this.generatePath();
-    this.animatePath();
+    this.renderChart(
+      demoData.map(d => d.timeLabel),
+      demoData.map(d => d.y)
+    );
   }
 
-  /**
-   * Extracts data points from network health records
-   */
   extractDataPoints() {
-    const values = this.data.map((record: any) => {
+    const categories: string[] = [];
+    const seriesData: number[] = [];
+
+    this.data.forEach((record: any) => {
       let val = 0;
-      // If data is from DynamoDB probe endpoint (has deviceId)
       if (record.deviceId !== undefined) {
         switch (this.metric) {
           case 'bandwidth':
@@ -154,9 +220,7 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
           case 'uptime':
             val = record.uptimeStatus === 'online' ? 100 : 0; break;
         }
-      }
-      // If data is from MongoDB backend (has metrics object)
-      else {
+      } else {
         const metrics = record.metrics;
         switch (this.metric) {
           case 'bandwidth':
@@ -171,70 +235,41 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
       }
 
       let dateObj = record.timestamp ? new Date(record.timestamp) : new Date();
-      return { val, timeLabel: dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), record };
+      categories.push(dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      seriesData.push(val);
     });
 
-    this.graphPoints = values.map((data, index) => ({
-      x: (index / Math.max(values.length - 1, 1)) * 100,
-      y: data.val,
-      timeLabel: data.timeLabel,
-      originalRecord: data.record
-    }));
+    this.renderChart(categories, seriesData);
   }
 
-  /**
-   * Calculates Y-axis bounds with 10% padding
-   */
-  calculateBounds() {
-    if (this.graphPoints.length === 0) return;
-
-    const values = this.graphPoints.map(p => p.y);
-    const range = Math.max(...values) - Math.min(...values);
-
-    this.maxValue = Math.max(...values) + range * 0.1;
-    this.minValue = Math.max(0, Math.min(...values) - range * 0.1);
-
-    // Create 5 evenly spaced grid lines
-    const step = (this.maxValue - this.minValue) / 4;
-    this.gridLines = Array.from({ length: 5 }, (_, i) => this.minValue + step * i);
-  }
-
-  /**
-   * Generates SVG path with smooth bezier curves
-   */
-  generatePath() {
-    if (this.graphPoints.length === 0) return;
-
-    const points = this.graphPoints.map(p => ({ x: p.x, y: this.normalizeY(p.y) }));
-    let path = `M ${points[0].x} ${points[0].y}`;
-
-    for (let i = 0; i < points.length - 1; i++) {
-      const controlX = (points[i].x + points[i + 1].x) / 2;
-      path += ` Q ${controlX} ${points[i].y}, ${points[i + 1].x} ${points[i + 1].y}`;
+  renderChart(categories: string[], data: number[]) {
+    this.pointsCount = data.length;
+    if (data.length > 0) {
+      this.maxValue = Math.max(...data);
+      this.minValue = Math.min(...data);
+    } else {
+      this.maxValue = 0;
+      this.minValue = 0;
     }
 
-    this.pathData = path;
-    this.areaPathData = `${path} L ${points[points.length - 1].x} 100 L ${points[0].x} 100 Z`;
-  }
+    const color = this.getMetricColor();
 
-  /**
-   * Converts value to SVG Y coordinate (inverted)
-   */
-  normalizeY(value: number): number {
-    const range = this.maxValue - this.minValue;
-    return range === 0 ? 50 : 100 - ((value - this.minValue) / range) * 100;
-  }
-
-  /**
-   * Animates path drawing over 1.5 seconds
-   */
-  animatePath() {
-    const startTime = Date.now();
-    const animate = () => {
-      this.animationProgress = Math.min((Date.now() - startTime) / 1500, 1);
-      if (this.animationProgress < 1) requestAnimationFrame(animate);
-    };
-    animate();
+    if (this.chart) {
+      this.chart.updateOptions({
+        xaxis: {
+          categories: categories
+        },
+        colors: [color],
+        series: [{
+          name: this.getMetricLabel(),
+          data: data
+        }]
+      });
+    } else {
+      this.chartOptions.xaxis.categories = categories;
+      this.chartOptions.series[0].data = data;
+      this.chartOptions.colors = [color];
+    }
   }
 
   getMetricLabel(): string {
@@ -255,9 +290,5 @@ export class NetworkHealthGraphComponent implements OnInit, OnChanges {
       uptime: '#38ef7d'
     };
     return colors[this.metric];
-  }
-
-  getGradientId(): string {
-    return `gradient-${this.metric}`;
   }
 }

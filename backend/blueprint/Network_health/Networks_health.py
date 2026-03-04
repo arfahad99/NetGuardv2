@@ -1,3 +1,7 @@
+"""
+Network Health blueprint for accessing network performance metrics.
+Supports retrieving, adding, and updating network health records.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required, role_required
 

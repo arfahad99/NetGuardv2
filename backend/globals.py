@@ -1,3 +1,7 @@
+"""
+Global database initialization and configuration for NetGuardV2.
+Provides a DynamoDB wrapper that behaves like PyMongo.
+"""
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from dotenv import load_dotenv

@@ -1,3 +1,7 @@
+"""
+Authentication blueprint for registering, verifying and signing in users.
+Handles Amazon Cognito integration and local fallback database.
+"""
 from flask import Blueprint, request, make_response, jsonify
 from decorators import jwt_required
 import bcrypt
@@ -307,7 +311,7 @@ def Signout():
     # Add to blacklist
     blacklist.insert_one({"token": token})
 
-    return make_response(jsonify({"Message": "Successfully Signout out"}), 200)
+    return make_response(jsonify({"Message": "Successfully Signed out"}), 200)
 
 
 # --------------Signout Code End---------------

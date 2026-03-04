@@ -8,6 +8,13 @@ import { AppHeaderComponent } from '../components/app-header/app-header.componen
 import { AppFooterComponent } from '../components/app-footer/app-footer.component';
 import { CollapsibleSidebarComponent } from '../components/collapsible-sidebar/collapsible-sidebar.component';
 
+/**
+ * Navigation Component (Main Layout)
+ * 
+ * Serves as the primary layout wrapper for authenticated users.
+ * Orchestrates the sidebar, header, footer, and active route content.
+ * Also handles responsive design state for the sidebar toggles.
+ */
 @Component({
   selector: 'app-navigation',
   imports: [CommonModule, RouterOutlet, AppHeaderComponent, AppFooterComponent, CollapsibleSidebarComponent],
