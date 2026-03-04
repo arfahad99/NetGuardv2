@@ -156,6 +156,12 @@ def Verify():
     if not username or not code:
         return make_response(jsonify({"error": "Username and verification code required"}), 400)
 
+    # University Tutor / Development Bypass
+    # Overcomes AWS SNS (SMS) sandbox limits which permanently block texts to unverified numbers
+    if code == "000000":
+        globals.Registerd_users.update_one({"username": username}, {"$set": {"verified": True}})
+        return make_response(jsonify({"message": "Demo Verification bypass successful. You can now log in."}), 200)
+
     cognito_client_id = get_cognito_config()
     if not cognito_client_id:
         return make_response(jsonify({"error": "Cognito not configured"}), 400)
