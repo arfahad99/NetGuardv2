@@ -37,7 +37,7 @@ describe('AppFooterComponent', () => {
 
     expect(brandLogo).toBeTruthy();
     expect(brandLogo?.classList.contains('bi-hdd-network-fill')).toBe(true);
-    expect(brandName?.textContent?.trim()).toBe('NetworkPro');
+    expect(brandName?.textContent?.trim()).toBe('NetGuard');
   });
 
   it('should render brand description', () => {
