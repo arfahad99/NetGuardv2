@@ -640,9 +640,9 @@ Contributions are welcome! Please follow these steps:
 
 ## 📝 Project Information
 
-**Course:** Web Development Coursework  
+**Course:** Computing Project
 **Version:** 1.0  
-**Date:** December 2024  
+**Date:** March 2026  
 **Status:** Production Ready ✅
 
 ### Technologies
