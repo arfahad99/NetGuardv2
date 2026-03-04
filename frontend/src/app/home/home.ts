@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../services/api.service';
@@ -26,27 +26,27 @@ import { StatusBadgeComponent } from '../components/status-badge/status-badge.co
  * for parallel API calls to improve performance.
  */
 @Component({
-    selector: 'app-home',
-    imports: [CommonModule, RouterLink, TextFlipComponent, NetworkHealthGraphComponent, StatusBadgeComponent],
-    templateUrl: './home.html',
-    styleUrls: ['./home.css']
+  selector: 'app-home',
+  imports: [CommonModule, RouterLink, TextFlipComponent, NetworkHealthGraphComponent, StatusBadgeComponent],
+  templateUrl: './home.html',
+  styleUrls: ['./home.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   /** Statistics summary for dashboard cards */
   stats = { devices: 0, alerts: 0, networkHealth: 0, sessions: 0 };
-  
+
   /** Recent alerts (limited to 5) */
   recentAlerts: any[] = [];
-  
+
   /** Recent devices (limited to 5) */
   recentDevices: any[] = [];
-  
+
   /** Network health data for graphs (20 records) */
   networkHealthData: any[] = [];
-  
+
   /** Loading state for initial data fetch */
   loading = true;
-  
+
   /** Current time string updated every second */
   currentTime = '';
 
@@ -56,8 +56,19 @@ export class HomeComponent implements OnInit {
     setInterval(() => this.updateTime(), 1000);
   }
 
+  private refreshInterval: any;
+
   ngOnInit() {
     this.loadData();
+    this.refreshInterval = setInterval(() => {
+      this.loadData(true);
+    }, 30000); // 30 seconds refresh
+  }
+
+  ngOnDestroy() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
 
   /**
@@ -72,17 +83,21 @@ export class HomeComponent implements OnInit {
    * Loads all dashboard data in parallel using forkJoin
    * Fetches devices, alerts, network health, and sessions simultaneously
    */
-  loadData() {
+  loadData(isRefresh = false) {
+    if (!isRefresh) {
+      this.loading = true;
+    }
     forkJoin({
-      devices: this.api.getDevices(1, 5),
-      alerts: this.api.getAlerts(1, 5),
-      networkHealth: this.api.getNetworkHealth(1, 20),
-      sessions: this.api.getSessions(1, 5)
+      devices: this.api.getDevices(),
+      alerts: this.api.getAlerts(),
+      networkHealth: this.api.getNetworkHealth(),
+      sessions: this.api.getSessions()
     }).subscribe({
       next: (data) => {
-        this.recentDevices = data.devices;
-        this.recentAlerts = data.alerts;
-        this.networkHealthData = data.networkHealth;
+        // Slice the arrays for the UI display, leaving the full arrays for stats
+        this.recentDevices = data.devices.slice(0, 5);
+        this.recentAlerts = data.alerts.slice(0, 5);
+        this.networkHealthData = data.networkHealth.slice(0, 20);
         this.stats = {
           devices: data.devices.length,
           alerts: data.alerts.length,
