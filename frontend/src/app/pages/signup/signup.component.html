@@ -42,143 +42,144 @@
                   <i class="bi bi-check-circle me-1"></i>Username looks good!
                 </div>
                 }
-                <div class="mb-3">
-                  <label class="form-label text-secondary">Verification Method *</label>
-                  <div class="d-flex gap-4">
-                    <div class="form-check cursor-pointer">
-                      <input class="form-check-input" type="radio" name="verificationMethod" id="methodEmail"
-                        value="email" [(ngModel)]="verificationMethod" (change)="onMethodChange()"
-                        style="cursor: pointer;">
-                      <label class="form-check-label text-white" for="methodEmail" style="cursor: pointer;">Email
-                        Address</label>
-                    </div>
-                    <div class="form-check cursor-pointer">
-                      <input class="form-check-input" type="radio" name="verificationMethod" id="methodPhone"
-                        value="phone" [(ngModel)]="verificationMethod" (change)="onMethodChange()"
-                        style="cursor: pointer;">
-                      <label class="form-check-label text-white" for="methodPhone" style="cursor: pointer;">Phone
-                        Number</label>
-                    </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-secondary">Verification Method *</label>
+                <div class="d-flex gap-4">
+                  <div class="form-check cursor-pointer">
+                    <input class="form-check-input" type="radio" name="verificationMethod" id="methodEmail"
+                      value="email" [(ngModel)]="verificationMethod" (change)="onMethodChange()"
+                      style="cursor: pointer;">
+                    <label class="form-check-label text-white" for="methodEmail" style="cursor: pointer;">Email
+                      Address</label>
+                  </div>
+                  <div class="form-check cursor-pointer">
+                    <input class="form-check-input" type="radio" name="verificationMethod" id="methodPhone"
+                      value="phone" [(ngModel)]="verificationMethod" (change)="onMethodChange()"
+                      style="cursor: pointer;">
+                    <label class="form-check-label text-white" for="methodPhone" style="cursor: pointer;">Phone
+                      Number</label>
                   </div>
                 </div>
-                @if (verificationMethod === 'email') {
-                <div class="mb-3">
-                  <label class="form-label text-secondary">Email *</label>
-                  <input type="email" class="form-control form-control-dark" [class.is-invalid]="emailError"
-                    [class.is-valid]="email && !emailError"
-                    [class.server-error]="emailError && emailError.includes('already')" [(ngModel)]="email" name="email"
-                    placeholder="Enter your email" (blur)="validateEmail()" (input)="onEmailInput()" required>
-                  @if (emailError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ emailError }}
-                  </div>
-                  }
-                  @if (email && !emailError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Email is valid!
-                  </div>
-                  }
-                </div>
-                } @else {
-                <div class="mb-3">
-                  <label class="form-label text-secondary">Phone Number (with country code) *</label>
-                  <input type="tel" class="form-control form-control-dark" [class.is-invalid]="phoneError"
-                    [class.is-valid]="phone && !phoneError"
-                    [class.server-error]="phoneError && phoneError.includes('already')" [(ngModel)]="phone" name="phone"
-                    placeholder="e.g. +1234567890" (blur)="validatePhone()" (input)="onPhoneInput()" required>
-                  @if (phoneError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ phoneError }}
-                  </div>
-                  }
-                  @if (phone && !phoneError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Phone number is valid!
-                  </div>
-                  }
+              </div>
+              @if (verificationMethod === 'email') {
+              <div class="mb-3">
+                <label class="form-label text-secondary">Email *</label>
+                <input type="email" class="form-control form-control-dark" [class.is-invalid]="emailError"
+                  [class.is-valid]="email && !emailError"
+                  [class.server-error]="emailError && emailError.includes('already')" [(ngModel)]="email" name="email"
+                  placeholder="Enter your email" (blur)="validateEmail()" (input)="onEmailInput()" required>
+                @if (emailError) {
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ emailError }}
                 </div>
                 }
-                <div class="mb-3">
-                  <label class="form-label text-secondary">Password *</label>
-                  <div class="input-group">
-                    <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control-dark"
-                      [class.is-invalid]="passwordError" [class.is-valid]="password && !passwordError"
-                      [(ngModel)]="password" name="password" placeholder="Create a password (min 6 characters)"
-                      (blur)="validatePassword()" (input)="validatePassword()" required minlength="6">
-                    <button type="button" class="input-group-text"
-                      style="background: var(--dark-bg); border-color: var(--border-color); color: var(--text-secondary); cursor: pointer;"
-                      (click)="showPassword = !showPassword">
-                      <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                    </button>
-                  </div>
-                  @if (passwordError) {
-                  <div class="invalid-feedback d-block">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ passwordError }}
-                  </div>
-                  }
-                  @if (password && !passwordError) {
-                  <div class="valid-feedback d-block">
-                    <i class="bi bi-check-circle me-1"></i>Password strength: {{ getPasswordStrength() }}
-                  </div>
-                  }
-                  @if (password && password.length > 0) {
-                  <div class="mt-2">
-                    <div class="progress" style="height: 5px; background: var(--dark-bg);">
-                      <div class="progress-bar" [class]="getPasswordStrengthClass()"
-                        [style.width.%]="getPasswordStrengthPercent()"></div>
-                    </div>
-                  </div>
-                  }
+                @if (email && !emailError) {
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Email is valid!
                 </div>
-                <div class="mb-4">
-                  <small class="text-secondary">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Password must be at least 6 characters long
-                  </small>
+                }
+              </div>
+              } @else {
+              <div class="mb-3">
+                <label class="form-label text-secondary">Phone Number (with country code) *</label>
+                <input type="tel" class="form-control form-control-dark" [class.is-invalid]="phoneError"
+                  [class.is-valid]="phone && !phoneError"
+                  [class.server-error]="phoneError && phoneError.includes('already')" [(ngModel)]="phone" name="phone"
+                  placeholder="e.g. +1234567890" (blur)="validatePhone()" (input)="onPhoneInput()" required>
+                @if (phoneError) {
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ phoneError }}
                 </div>
-                <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading || !isFormValid()">
-                  @if (loading) {
-                  <span class="spinner-border spinner-border-sm me-2"></span>
-                  }
-                  Create Account
-                </button>
-                } @else {
-                <!-- VERIFICATION FORM -->
-                <div class="alert alert-info d-flex align-items-center mb-4" role="alert"
-                  style="background: rgba(13, 110, 253, 0.1); border-color: rgba(13, 110, 253, 0.2); color: #9ec5fe;">
-                  <i class="bi bi-envelope-check-fill me-2 fs-4"></i>
-                  <div>
-                    We've sent a verification code to <strong class="text-white">{{ verificationMethod === 'email' ?
-                      email : phone }}</strong>.<br>Please enter it
-                    below to activate your account.
-                  </div>
+                }
+                @if (phone && !phoneError) {
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Phone number is valid!
                 </div>
-
-                <div class="mb-4">
-                  <label class="form-label text-secondary">Verification Code</label>
-                  <input type="text" class="form-control form-control-dark form-control-lg text-center fw-bold"
-                    style="letter-spacing: 0.25rem; font-size: 1.5rem;" [(ngModel)]="verificationCode"
-                    name="verificationCode" placeholder="000000" required>
-                  @if (verificationError) {
-                  <div class="invalid-feedback d-block mt-2">
-                    <i class="bi bi-exclamation-circle me-1"></i>{{ verificationError }}
-                  </div>
-                  }
-                </div>
-
-                <button type="submit" class="btn btn-gradient w-100 mb-4" [disabled]="loading || !verificationCode">
-                  @if (loading) { <span class="spinner-border spinner-border-sm me-2"></span> }
-                  Verify Account
-                </button>
-
-                <div class="text-center bg-dark rounded p-3 mt-2" style="border: 1px solid var(--border-color);">
-                  <span class="text-secondary me-2">Didn't receive the code?</span>
-                  <button type="button" class="btn btn-outline-secondary w-100" (click)="resendVerificationCode()"
-                    [disabled]="loading">
-                    Didn't receive the code? <strong>Resend Code</strong>
+                }
+              </div>
+              }
+              <div class="mb-3">
+                <label class="form-label text-secondary">Password *</label>
+                <div class="input-group">
+                  <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control-dark"
+                    [class.is-invalid]="passwordError" [class.is-valid]="password && !passwordError"
+                    [(ngModel)]="password" name="password" placeholder="Create a password (min 6 characters)"
+                    (blur)="validatePassword()" (input)="validatePassword()" required minlength="6">
+                  <button type="button" class="input-group-text"
+                    style="background: var(--dark-bg); border-color: var(--border-color); color: var(--text-secondary); cursor: pointer;"
+                    (click)="showPassword = !showPassword">
+                    <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                   </button>
                 </div>
+                @if (passwordError) {
+                <div class="invalid-feedback d-block">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ passwordError }}
+                </div>
                 }
+                @if (password && !passwordError) {
+                <div class="valid-feedback d-block">
+                  <i class="bi bi-check-circle me-1"></i>Password strength: {{ getPasswordStrength() }}
+                </div>
+                }
+                @if (password && password.length > 0) {
+                <div class="mt-2">
+                  <div class="progress" style="height: 5px; background: var(--dark-bg);">
+                    <div class="progress-bar" [class]="getPasswordStrengthClass()"
+                      [style.width.%]="getPasswordStrengthPercent()"></div>
+                  </div>
+                </div>
+                }
+              </div>
+              <div class="mb-4">
+                <small class="text-secondary">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Password must be at least 6 characters long
+                </small>
+              </div>
+              <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading || !isFormValid()">
+                @if (loading) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                Create Account
+              </button>
+              } @else {
+              <!-- VERIFICATION FORM -->
+              <div class="alert alert-info d-flex align-items-center mb-4" role="alert"
+                style="background: rgba(13, 110, 253, 0.1); border-color: rgba(13, 110, 253, 0.2); color: #9ec5fe;">
+                <i class="bi bi-envelope-check-fill me-2 fs-4"></i>
+                <div>
+                  We've sent a verification code to <strong class="text-white">{{ verificationMethod === 'email' ?
+                    email : phone }}</strong>.<br>Please enter it
+                  below to activate your account.
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label text-secondary">Verification Code</label>
+                <input type="text" class="form-control form-control-dark form-control-lg text-center fw-bold"
+                  style="letter-spacing: 0.25rem; font-size: 1.5rem;" [(ngModel)]="verificationCode"
+                  name="verificationCode" placeholder="000000" required>
+                @if (verificationError) {
+                <div class="invalid-feedback d-block mt-2">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ verificationError }}
+                </div>
+                }
+              </div>
+
+              <button type="submit" class="btn btn-gradient w-100 mb-4" [disabled]="loading || !verificationCode">
+                @if (loading) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                Verify Account
+              </button>
+
+              <div class="text-center bg-dark rounded p-3 mt-2" style="border: 1px solid var(--border-color);">
+                <span class="text-secondary me-2">Didn't receive the code?</span>
+                <button type="button" class="btn btn-outline-secondary w-100" (click)="resendVerificationCode()"
+                  [disabled]="loading">
+                  Didn't receive the code? <strong>Resend Code</strong>
+                </button>
+              </div>
+              }
             </form>
             <p class="text-center text-secondary mb-0">
               Already have an account? <a routerLink="/login" class="text-decoration-none" style="color: #667eea;">Sign
