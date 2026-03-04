@@ -232,6 +232,7 @@ npm-dashboard/
 - **Bootstrap 5.3.3** - Responsive UI framework
 - **Bootstrap Icons 1.11.3** - Icon library
 - **RxJS 7.8.0** - Reactive programming
+- **ApexCharts / ng-apexcharts** - Advanced interactive data visualization
 
 ### Backend
 - **Flask** - Python web framework
@@ -256,7 +257,7 @@ npm-dashboard/
 Displays status with icon and color using Angular 20 @switch directive. Supports online, offline, warning, active, critical, and custom statuses.
 
 ### NetworkHealthGraphComponent
-Animated SVG graphs for bandwidth, latency, uptime, and packet loss metrics. Uses requestAnimationFrame for smooth animations.
+Interactive ApexCharts for bandwidth, latency, uptime, and packet loss metrics. Features dynamic tooltips, smooth glass-morphic gradients, auto-scaling axes, and responsive design.
 
 ### CollapsibleSidebarComponent
 Navigation sidebar with role-based menu items, theme toggle, and user profile display.
@@ -539,7 +540,7 @@ Comprehensive monitoring dashboard:
 - Real-time statistics
 - Device management with CRUD
 - Alert system with severity levels
-- Network health metrics with animated graphs
+- Network health metrics with interactive ApexCharts visualizations
 - QoS events tracking
 - Session management
 
@@ -592,9 +593,9 @@ Comprehensive monitoring dashboard:
 ✅ Responsive design with Bootstrap 5.3.3  
 ✅ Professional header/footer/sidebar layout  
 ✅ Backend health monitoring system  
-✅ Dark/light mode support with theme toggle  
+✅ Theme toggle support with LocalStorage persistence  
 ✅ Toast notification system  
-✅ Animated components and graphs  
+✅ Interactive ApexCharts and animated components  
 ✅ Complete API integration with proper pagination  
 ✅ User management system (admin only)  
 ✅ Consistent file structure across all components  
