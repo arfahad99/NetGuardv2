@@ -149,11 +149,11 @@ describe('SignupComponent', () => {
 
   it('should toggle password visibility', () => {
     expect(component.showPassword).toBeFalse();
-    
+
     // Simulate clicking the eye icon
     component.showPassword = !component.showPassword;
     expect(component.showPassword).toBeTrue();
-    
+
     component.showPassword = !component.showPassword;
     expect(component.showPassword).toBeFalse();
   });
@@ -170,7 +170,7 @@ describe('SignupComponent', () => {
 
     component.onSignup();
 
-    expect(authSpy.signup).toHaveBeenCalledWith('testuser', 'test@example.com', 'password123');
+    expect(authSpy.signup).toHaveBeenCalledWith('testuser', 'test@example.com', 'password123', '');
     expect(toastSpy.success).toHaveBeenCalledWith('Account created successfully! Please sign in.');
     expect(router.navigate).toHaveBeenCalledWith(['/signin']);
   });
