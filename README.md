@@ -7,6 +7,8 @@ A modern, full-stack network monitoring dashboard built with **Angular 20.3.15**
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-Python-green.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-green.svg)
+![AWS DynamoDB](https://img.shields.io/badge/AWS-DynamoDB-blue.svg)
+![AWS Cognito](https://img.shields.io/badge/AWS-Cognito-orange.svg)
 ![Tests](https://img.shields.io/badge/tests-239%20passing-brightgreen.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen.svg)
@@ -16,6 +18,7 @@ A modern, full-stack network monitoring dashboard built with **Angular 20.3.15**
 ## ✨ Features
 
 ### 🔐 Enterprise-Grade Security
+- **Amazon Cognito Integration** - Real-world Email/Phone OTP Verification for User Signups
 - **Role-Based Access Control (RBAC)** with 3 user roles
 - **JWT Authentication** with token blacklisting
 - **Bcrypt Password Hashing** for secure storage
@@ -23,12 +26,12 @@ A modern, full-stack network monitoring dashboard built with **Angular 20.3.15**
 - **Session Management** with automatic expiry
 
 ### 📊 Network Monitoring
-- **Real-time Dashboard** with network statistics
+- **Real-time Dashboard** with deep network statistics
+- **Automated Measurements** - Latency, Bandwidth, and Packet Loss calculations via `probe.py`
+- **Time-Series Data** - Historical metrics securely stored with timestamps automatically via DynamoDB
+- **Intelligent Threshold Alerts** - Alerts auto-trigger dynamically based on latency/packet loss limits
 - **Device Management** - Track and manage network devices
-- **Alert System** - Monitor and respond to network alerts
-- **Network Health** - View overall network status
 - **QoS Events** - Quality of Service monitoring
-- **Session Tracking** - Active network sessions
 
 ### 🎨 Modern UI/UX
 - **Modern Angular 20 Patterns** - Standalone components, functional guards/interceptors
@@ -97,44 +100,50 @@ A modern, full-stack network monitoring dashboard built with **Angular 20.3.15**
 - Jasmine: 5.1.0
 - Karma: 6.4.4
 
-### Installation
+### For University Tutors: Running Locally
+If you are assessing this application on a local machine, the system is designed to seamlessly fall back to a local database system so you do not have to provide AWS API Keys! 
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/npm-dashboard.git
-cd npm-dashboard
+git clone https://github.com/arfahad99/NetGuardv2.git
+cd NetGuardv2
 ```
 
-2. **Backend Setup**
-```bash
-cd backend
-pip install -r requirements.txt
-
-# Configure MongoDB connection in globals.py
-# Update SECRET_KEY and database settings
-
-# Run backend
-python app.py
-# Backend runs on http://localhost:5001
-```
-
-3. **Frontend Setup**
+2. **Frontend Setup (Angular)**
 ```bash
 cd frontend
 npm install
-
-# Run frontend
-npm start
-# Frontend runs on http://localhost:4200
+npm install -g @angular/cli
+ng serve
+# Access the incredible dashboard at: http://localhost:4200
 ```
 
-4. **Access the Application**
-- Open browser: `http://localhost:4200`
-- Click "Guest Login" for instant demo access (1-hour session)
-- Or sign up for a new account
-- Or sign in with existing credentials
+3. **Backend Setup (Python/Flask)**
+Open a *new* terminal window:
+```bash
+cd backend
+python -m venv venv
+# Activate the environment:
+# Windows: venv\Scripts\activate 
+# Mac/Linux: source venv/bin/activate
+pip install -r requirements.txt
 
-5. **Run Tests**
+# Run the backend locally
+python app.py
+# The local API will start broadcasting on http://localhost:5001
+```
+
+*Note: Since AWS Cognito will not be active on your machine without an AWS EC2 `.env` file, the backend will intelligently skip the email verification step entirely and automatically activate local test accounts for you so you can grade the submission without hassle!*
+
+4. **Testing the Probe (Bonus)**
+You can run the network probe locally to simulate gathering latency/packet loss metrics! 
+```bash
+cd probe
+pip install requests psutil speedtest-cli ping3
+python probe.py
+```
+
+### Run Automated Tests
 ```bash
 cd frontend
 npm test
