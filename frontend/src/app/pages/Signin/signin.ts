@@ -113,15 +113,14 @@ export class SigninComponent {
           const role = this.authService.getRole();
           const roleDisplay = this.getRoleDisplay(role);
 
-          // Show success message
-          this.toast.success(`Welcome back, ${username}! 👋\nRole: ${roleDisplay}`);
-
           // Reset login attempts
           this.loginAttempts = 0;
           this.loading = false;
 
-          // Navigate to home page
-          this.router.navigate(['/home']);
+          // Navigate to home page then show welcome message
+          this.router.navigate(['/home']).then(() => {
+            this.toast.success(`Welcome back, ${username}! 👋\nRole: ${roleDisplay}`);
+          });
 
           resolve();
         },
@@ -159,8 +158,9 @@ export class SigninComponent {
     this.authService.guestLogin().subscribe({
       next: () => {
         const username = this.authService.getUsername();
-        this.toast.success(`Welcome, ${username}! 👋\nRole: Guest (Read-only access)`);
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home']).then(() => {
+          this.toast.success(`Welcome, ${username}! 👋\nRole: Guest (Read-only access)`);
+        });
       },
       error: () => {
         this.loading = false;
