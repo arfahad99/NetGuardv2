@@ -8,6 +8,13 @@ The Python backend is designed to intelligently detect if it is running in a loc
 
 This allows you to test the entire suite of features securely without any cloud provisioning.
 
+### 💾 Importing the Provided Database
+I have included an export of my local MongoDB collections in the submission zip file. To populate your local test environment with the exact data shown in my demonstration:
+1. Open **MongoDB Compass**.
+2. Connect to `mongodb://localhost:27017`.
+3. Create a new database named **`NPMDB`**.
+4. Import the provided backup collections: `Registerd_users`, `alerts`, `devices`, `network_health`, `qos_events`, `sessions`, and `probe_measurements`.
+
 ---
 
 ## 🚀 Quick Start Guide
@@ -83,7 +90,16 @@ npm test
 
 ---
 
-## � 6. Testing Cognito Phone/Email Verification
+## 💾 6. Importing the Provided Database
+I have included an export of my local MongoDB collections in the submission zip file. To populate your local test environment with the exact data shown in my demonstration:
+1. Open **MongoDB Compass**.
+2. Connect to `mongodb://localhost:27017`.
+3. Create a new database named **`NPMDB`**.
+4. Import the provided backup collections: `Registerd_users`, `alerts`, `devices`, `network_health`, `qos_events`, `sessions`, and `probe_measurements`.
+
+---
+
+## 📱 7. Testing Cognito Phone/Email Verification
 If you connect the backend to an actual AWS environment, the AWS Simple Notification Service (SNS) typically restricts outgoing SMS messages only to pre-verified developer phone numbers (due to strict anti-spam limits in the SNS Sandbox).
 
 To allow you to demo the seamless Phone/Email OTP verification flow without any actual SMS delivery restrictions:
@@ -94,5 +110,5 @@ To allow you to demo the seamless Phone/Email OTP verification flow without any 
 
 ---
 
-## �🔑 Accessing as a Temporary Guest
+## 🔑 8. Accessing as a Temporary Guest
 If you do not wish to create a user account via the sign-up page, you can simply click **"Continue as Guest"** on the main Sign In page on `http://localhost:4200`. The system will automatically construct a temporary active session for 1 hour to let you demo the system.
