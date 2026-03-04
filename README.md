@@ -1,4 +1,4 @@
-# 🌐 NetworkPro Management Dashboard
+# 🌐 NetGuard Management Dashboard
 
 A modern, full-stack network monitoring dashboard built with **Angular 20.3.15** and **Flask**, featuring enterprise-grade role-based access control, real-time monitoring, and comprehensive automated testing.
 
@@ -46,7 +46,7 @@ A modern, full-stack network monitoring dashboard built with **Angular 20.3.15**
 - **Professional Layout** - Header, sidebar, footer with consistent styling
 
 ### 🧪 Comprehensive Testing
-- **239 Automated Tests** - 100% passing
+- **234 Automated Tests** - 100% passing
 - **Component Tests** - UI components and user interactions
 - **Service Tests** - API integration and business logic
 - **Pipe & Directive Tests** - Custom pipes and directives
@@ -154,7 +154,7 @@ npm test
 
 ## ☁️ Deployment & Cloud Operations
 
-NetworkPro is designed for deployment on AWS (Amazon Web Services). The cloud architecture involves an EC2 instance hosting the Python backend and Angular frontend, with DynamoDB handling the database operations.
+NetGuard is designed for deployment on AWS (Amazon Web Services). The cloud architecture involves an EC2 instance hosting the Python backend and Angular frontend, with DynamoDB handling the database operations.
 
 ### Architecture Overview
 - **Frontend App**: Built with Angular 20, served using a web server (e.g., Nginx) or directly deployed to S3/CloudFront.

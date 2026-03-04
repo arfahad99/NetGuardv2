@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NetworkPro Probe — measures real network performance and
+NetGuard Probe — measures real network performance and
 sends results to the Flask backend every INTERVAL_SECONDS.
 """
 
