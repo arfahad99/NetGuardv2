@@ -684,6 +684,19 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
+## 🤖 AI Tools Acknowledgement
+
+This project utilised AI-assisted development tools (Google Gemini) during the development process for the following tasks:
+
+- **Debugging**: Identifying and resolving frontend test failures and build errors
+- **Code Review**: Spotting inconsistencies such as hardcoded URLs and naming mismatches
+- **Refactoring Suggestions**: Renaming variables for consistency (e.g., standardising "Measurements" to "Network Health" across the codebase)
+- **Documentation**: Assisting with README structure and the Local Testing Guide
+
+All AI-generated suggestions were critically reviewed, understood, and manually integrated by the developer. The core system architecture, design decisions (including the DynamoDB Adapter Pattern, JWT/RBAC security layer, and the probe data pipeline), and all implementation code are the original work of the student.
+
+---
+
 ## 🙏 Acknowledgments
 
 - Angular team for the modern framework
