@@ -83,5 +83,16 @@ npm test
 
 ---
 
-## 🔑 Accessing as a Temporary Guest
+## � 6. Testing Cognito Phone/Email Verification
+If you connect the backend to an actual AWS environment, the AWS Simple Notification Service (SNS) typically restricts outgoing SMS messages only to pre-verified developer phone numbers (due to strict anti-spam limits in the SNS Sandbox).
+
+To allow you to demo the seamless Phone/Email OTP verification flow without any actual SMS delivery restrictions:
+1. Sign Up for a new account.
+2. Select either **Email** or **Phone** verification. 
+3. When prompted for the Verification Code on the next screen, simply type: **`000000`**
+4. The system will **instantly bypass** AWS validation, activate the user safely in the local database, and let you sign in!
+
+---
+
+## �🔑 Accessing as a Temporary Guest
 If you do not wish to create a user account via the sign-up page, you can simply click **"Continue as Guest"** on the main Sign In page on `http://localhost:4200`. The system will automatically construct a temporary active session for 1 hour to let you demo the system.
