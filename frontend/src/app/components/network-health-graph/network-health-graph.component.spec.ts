@@ -44,31 +44,31 @@ describe('NetworkHealthGraphComponent', () => {
   it('should process bandwidth data correctly', () => {
     component.metric = 'bandwidth';
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBe(2);
+    expect(component.pointsCount).toBe(2);
   });
 
   it('should process latency data correctly', () => {
     component.metric = 'latency';
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBe(2);
+    expect(component.pointsCount).toBe(2);
   });
 
   it('should process uptime data correctly', () => {
     component.metric = 'uptime';
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBe(2);
+    expect(component.pointsCount).toBe(2);
   });
 
   it('should process packet loss data correctly', () => {
     component.metric = 'packet_loss';
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBe(2);
+    expect(component.pointsCount).toBe(2);
   });
 
   it('should handle empty data', () => {
     component.data = [];
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBeGreaterThan(0); // Demo data is generated
+    expect(component.pointsCount).toBeGreaterThan(0); // Demo data is generated
   });
 
   it('should get correct metric label', () => {
@@ -84,6 +84,6 @@ describe('NetworkHealthGraphComponent', () => {
     component.data = incompleteData;
     component.metric = 'bandwidth';
     component.ngOnChanges();
-    expect(component.graphPoints.length).toBe(1);
+    expect(component.pointsCount).toBe(1);
   });
 });
